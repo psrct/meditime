@@ -5,53 +5,137 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 
 const conn = require('./database.js');
+const session = require('express-session');
+const { checkLoggedIn, bypasslogin } = require('./middleware.js');
+const { time } = require('console');
 
 app.use(express.static('webpages'));
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: false }));
+app.use(session({
+  secret: 'my_session_secret',
+  resave: true,
+  saveUninitialized: false,
+  name: 'user',
+  cookie: {
+    maxAge: 18000000
+  }
+}));
+
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
+})
 
 
-app.get('/login', function(req, res){
-  res.sendFile(path.join(__dirname, '/webpages/login.html'));
+app.get('/login', bypasslogin, function(req, res){
+  res.render('login');
 });
 
-app.get('/login/start', function(req, res){
+app.post('/login', function(req, res){
+  console.log(req.body);
   let loginData = {
-    username: req.query.username,
-    password: req.query.password,
-    };
-    // console.log(loginData);  
-    const sql = `select * from users where username = "${loginData.username}" `;
-    conn.all(sql, function(err, rows){
-      console.log(rows);
-      if(rows.length < 1){
-        res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = './';</script> ")
-      }else if(loginData.password != rows[0].passpword){
-        res.send("<script>alert('รหัสผ่านไม่ถูกต้อง'); window.location.href = './';</script> ")
-      }else{
-        res.redirect("/home");
+    username: req.body.username,
+    password: req.body.password
+  }
+  const sql = `select * from Patients where username = "${loginData.username}" `;
+  conn.all(sql, function(err, rows){
+    console.log(rows);
+    if(rows.length < 1){
+      res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login';</script> ")
+    }else if(loginData.password != rows[0].password){
+      res.send("<script>alert('รหัสผ่านไม่ถูกต้อง'); window.location.href = '/login';</script> ")
+    }else{
+      req.session.user = {
+        id: rows[0].patient_id,
+        username: rows[0].username,
+        prename: rows[0].prename,
+        firstname: rows[0].firstname,
+        lastname: rows[0].lastname,
+        birth_date: rows[0].birth_date,
+        gender: rows[0].gender
       }
-    })
+      res.redirect("/");
+    }
+  });
+});
+
+app.get('/login-staff', bypasslogin, function(req, res){
+  res.render('login-staff');
+});
+
+app.post('/login-staff', function(req, res){
+  console.log(req.body);
+  let loginData = {
+    username: req.body.username,
+    password: req.body.password
+  }
+  const sql = `select * from Doctors where username = "${loginData.username}" `;
+  conn.all(sql, function(err, rows){
+    console.log(rows);
+    if(rows.length < 1){
+      res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login-staff';</script> ")
+    }else if(loginData.password != rows[0].password){
+      res.send("<script>alert('รหัสผ่านไม่ถูกต้อง'); window.location.href = '/login-staff';</script> ")
+    }else{
+      req.session.user = {
+        id: rows[0].doctor_id,
+        username: rows[0].username,
+        prename: rows[0].prename,
+        firstname: rows[0].firstname,
+        lastname: rows[0].lastname,
+        gender: rows[0].gender,
+        specialty: rows[0].specialty_id
+      }
+      res.redirect("/");
+    }
+  });
 });
 
 app.get('/register', function(req, res){
-  res.sendFile(path.join(__dirname, '/webpages/register.html'));
+  res.render("register");
 });
 
-app.get('/register/start', function(req, res){
+app.post('/register', bypasslogin, function(req, res){
+  var cur_time = new Date().toUTCString();
+  console.log(cur_time);
+
+  console.log(req.body);
   let registerData = {
-    username: req.query.username,
-    password: req.query.password,
+    username: req.body.username,
+    password: req.body.password,
+    prename: req.body.prename,
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    gender: req.body.gender,
+    birth_date: req.body.birth_date
     };
     console.log(registerData);  
-    const sql = `insert into users(username, passpword) values("${registerData.username}", "${registerData.password}") `;
+    const sql = `insert into Patients(prename, firstname, lastname, birth_date, gender, register_datetime, username, password) 
+    values("${registerData.prename}",
+     "${registerData.firstname}"),
+     "${registerData.lastname}"),
+     "${registerData.birth_date}"),
+     "${registerData.gender}"),
+     "${cur_time}"),
+     "${registerData.username}"),
+     "${registerData.password}")
+      `;
     conn.run(sql, function(err){
       if (err) throw err;
       console.log("Add user successfully.");
     });
-    res.sendFile(path.join(__dirname, '/webpages/register.html'));
+    res.redirect('/');
 });
 
-app.get('/home', function(req, res){
-  res.sendFile(path.join(__dirname, '/webpages/home.html'));
+app.get('/', checkLoggedIn, function(req, res){
+  res.render('home');
+})
+
+app.get('/logout', function(req, res){
+  req.session.destroy();
+  res.clearCookie('user');
+  res.redirect('/');
 })
 
 
