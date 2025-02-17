@@ -49,11 +49,7 @@ app.post('/login', function(req, res){
       req.session.user = {
         id: rows[0].patient_id,
         username: rows[0].username,
-        prename: rows[0].prename,
-        firstname: rows[0].firstname,
-        lastname: rows[0].lastname,
-        birth_date: rows[0].birth_date,
-        gender: rows[0].gender
+        usertype: "patient"
       }
       res.redirect("/");
     }
@@ -77,15 +73,21 @@ app.post('/login-staff', function(req, res){
       res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login-staff';</script> ")
     }else if(loginData.password != rows[0].password){
       res.send("<script>alert('รหัสผ่านไม่ถูกต้อง'); window.location.href = '/login-staff';</script> ")
-    }else{
+    }else if(loginData.username === "admin"){
       req.session.user = {
         id: rows[0].doctor_id,
         username: rows[0].username,
-        prename: rows[0].prename,
-        firstname: rows[0].firstname,
-        lastname: rows[0].lastname,
-        gender: rows[0].gender,
-        specialty: rows[0].specialty_id
+        specialty: rows[0].specialty_id,
+        usertype: "clinic_owner"
+      }
+      res.redirect("/");
+    }
+    else{
+      req.session.user = {
+        id: rows[0].doctor_id,
+        username: rows[0].username,
+        specialty: rows[0].specialty_id,
+        usertype: "doctor"
       }
       res.redirect("/");
     }
