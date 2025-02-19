@@ -6,7 +6,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 
-let db = new sqlite3.Database('DatabaseMeditime.db', (err) => {
+let db = new sqlite3.Database('database.db', (err) => {
   if (err) {
     return console.error(err.message);
   }
