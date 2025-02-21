@@ -1,0 +1,53 @@
+<%-include("head")%>
+<style>
+    input {
+        font-size: 18px;
+    }
+
+    .txtbox{
+        color: rgb(157, 157, 157);
+    }
+</style>
+<body>
+
+    <form action="/profile" method="post">
+        <input id="username" class="txtbox" name="username" value="<%=data[0].username%>" readonly><br> <br>
+        <input id="prename" class="txtbox" name="prename" value="<%=data[0].prename%>" readonly><br><br>
+        <input id="firstname" class="txtbox" name="firstname" value="<%=data[0].firstname%>" readonly><br><br>
+        <input id="lastname" class="txtbox" name="lastname" value="<%=data[0].lastname%>" readonly><br><br>
+        <input id="birth_date" class="txtbox" name="birth_date" value="<%=data[0].birth_date%>" readonly><br><br>
+        <input id="gender" class="txtbox" name="gender" value="<%=data[0].gender%>" readonly>
+        <input onclick="toggleEdit()" type="button" value="Edit">
+        <input type="submit" value="Save">
+    </form>
+
+    <script>
+        let isedit = false;
+        function toggleEdit(){
+            console.log()
+            if(!isedit){
+                console.log("not Editing")
+
+                let txtbox = document.getElementsByClassName("txtbox");
+                for(let i=0; i<txtbox.length; i++){
+                    txtbox.item(i).removeAttribute("readonly");
+                    txtbox.item(i).style.color = "black";
+                }
+                isedit = true;
+                // console.log(isedit);
+            }else{
+                console.log("Editing")
+                
+                let txtbox = document.getElementsByClassName("txtbox");
+                for(let i=0; i<txtbox.length; i++){
+                    txtbox.item(i).setAttribute("readonly", true);
+                    txtbox.item(i).style.color = "rgb(157, 157, 157)";
+                }
+                isedit = false;
+            }
+        }
+    </script>
+
+</body>
+</html>
+
