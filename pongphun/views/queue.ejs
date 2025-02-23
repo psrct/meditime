@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditime Queue</title>
+</head>
+<body>
+    <h1 id="queue_count">จำนวนคิวปัจจุบัน: -</h1>
+    <div id="services_container">
+        <!-- <div id=1>
+            <input list="services_data" class="service_selected" type="text" placeholder="ชื่อบริการ..." onchange="services_filter(1)">
+            <datalist id="services_data"></datalist>
+            <a>ระยะเวลาบริการ : </a><input class="duration_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>
+            <a>ราคาบริการ : </a><input class="price_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>
+        </div> -->
+    </div>
+    <br>
+    <button id="add_service_button" onclick="addService()">+</button>
+    <br>
+    
+    <br><br>
+    <button id="queue_button" onclick="queue()">จองคิว</button>
+    <button id="cancel_button">ยกเลิก</button>
+
+    <script>
+        const services_container = document.getElementById("services_container");
+
+        const services_data = <%- JSON.stringify(services_data) %>;
+        let services_count = 0;
+
+        function services_filter(id) {
+            const temDiv = document.getElementById(id);
+            const tem_services_datalist = temDiv.querySelector("#services_data");
+
+            tem_services_datalist.innerHTML = "";
+            services_data.forEach(function(item) {
+                let temOption = document.createElement("option");
+                temOption.dataset.id = item.service_id;
+                temOption.dataset.duration = item.duration;
+                temOption.dataset.price = item.price;
+                temOption.innerHTML = item.price.toLocaleString() + " บาท";
+                temOption.value = item.name;
+                
+                tem_services_datalist.appendChild(temOption);
+            });
+        }
+
+        function addService() {
+            services_count += 1;
+            const temDiv = document.createElement("div");
+            temDiv.innerHTML = `<input list="services_data" class="service_selected" type="text" placeholder="ชื่อบริการ..." onchange="services_filter(${services_count})">\
+                                <datalist id="services_data"></datalist>\
+                                <a>ระยะเวลาบริการ : </a><input class="duration_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>\
+                                <a>ราคาบริการ : </a><input class="price_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>` +
+                                (services_count != 1 ? `<button onclick="removeService(${services_count})">-</button>` : ``);
+            temDiv.id = services_count;
+
+            services_container.appendChild(temDiv);
+            
+            services_filter(services_count);
+
+            document.getElementById(services_count).querySelector(".service_selected").addEventListener("input", function() {
+                const temDiv = document.getElementById(services_count);
+
+                const service_selected = temDiv.querySelector(".service_selected").value;
+                const service_selectedOption = [...temDiv.querySelector("#services_data").options]
+                    .find(option => option.value === service_selected);
+                
+                if (service_selectedOption) {
+                    const temPrice = service_selectedOption.dataset.price.toLocaleString() + " บาท";
+                    const temDuration = service_selectedOption.dataset.duration;
+                    const temDurationString = ((temDuration >= 60) ? ( Math.floor( temDuration / 60) ) + " ชั่วโมง " : "") + 
+                                        ( Math.floor( temDuration % 60) ) + " นาที";
+                    temDiv.querySelector(".duration_input").placeholder = temDurationString;
+                    temDiv.querySelector(".price_input").placeholder = temPrice;
+                } else {
+                    temDiv.querySelector(".duration_input").placeholder = "ไม่พบข้อมูลบริการ";
+                    temDiv.querySelector(".price_input").placeholder = "ไม่พบข้อมูลบริการ";
+                }
+            });
+        }
+        addService();
+
+        function removeService(id) {
+            services_count -= 1;
+            const temDiv = document.getElementById(id);
+            services_container.removeChild(temDiv);
+        }
+
+        function findQueueCount() {
+            document.getElementById("queue_count").innerHTML = "จำนวนคิวปัจจุบัน: " + <%= tasks_data.length %>;
+        }
+        findQueueCount();
+
+        function queue() {
+            const divAll = services_container.children;
+            
+            Array.from(divAll).forEach(function(item) {
+                console.log(item.querySelector(".service_selected").value);
+            })
+        }
+    </script>
+</body>
+
+</html>
