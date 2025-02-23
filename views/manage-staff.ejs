@@ -1,0 +1,52 @@
+<%-include("head")%>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<body>
+    <h1>ID: <%= user.id %></h1><br>
+    <h1>Hello <%= user.username %></h1>
+    <a href="/add-staff %>" class="btn btn-primary">Add Staff</a>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>doctor_id</th>
+                    <th>prename</th>
+                    <th>firstname</th>
+                    <th>lastname</th>
+                    <th>hire_date</th>
+                    <th>retire_date</th>
+                    <th>gender</th>
+                    <th>specialty_id</th>
+                    <th>username</th>
+                    <th>password</th>
+                    <th>Action</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <% data.forEach((item) => { %>
+                        <td><%= item.doctor_id %></td>
+                        <td><%= item.prename %></td>
+                        <td><%= item.firstname %></td>
+                        <td><%= item.lastname %></td>
+                        <td><%= item.hire_date %></td>
+                        <td><%= item.retire_date %></td>
+                        <td><%= item.gender %></td>
+                        <td><%= item.specialty_id %></td>
+                        <td><%= item.username %></td>
+                        <td><%= item.password %></td>
+                        <td><a href="/edit-staff/<%= item.doctor_id %>" class="btn btn-primary">Edit Info</a></td>
+                        <td><a href="/remove-staff/<%= item.doctor_id %>" class="btn btn-primary">Remove Staff</a></td>
+                    
+                    <% }) %>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a href="/logout">Logout</a><br>
+</body>
+</html>

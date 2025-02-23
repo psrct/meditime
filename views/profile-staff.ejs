@@ -1,0 +1,30 @@
+<%-include("head")%>
+<style>
+    input {
+        font-size: 18px;
+    }
+
+    .txtbox{
+        color: rgb(53, 72, 126);
+    }
+</style>
+<body>
+
+    <form action="/edit-staff/<%= data[0].doctor_id %>" method="post">
+        <input id="username" class="txtbox" name="username" value="<%=data[0].username%>" placeholder="username" readonly><br> <br>
+        <input id="prename" class="txtbox" name="prename" value="<%=data[0].prename%>" placeholder="prename" readonly><br><br>
+        <input id="firstname" class="txtbox" name="firstname" value="<%=data[0].firstname%>" placeholder="firstname" readonly><br><br>
+        <input id="lastname" class="txtbox" name="lastname" value="<%=data[0].lastname%>" placeholder="lastname" readonly><br><br>
+        <input id="retire_date" class="txtbox" name="retire_date" value="<%=data[0].retire_date%>" placeholder="retire_date" readonly><br><br>
+        <input id="gender" class="txtbox" name="gender" value="<%=data[0].gender%>" placeholder="gender" readonly>
+        <input id="specialty_id" class="txtbox" name="specialty_id" value="<%=data[0].specialty_id%>" placeholder="specialty_id" readonly>
+        <input onclick="toggleEdit()" type="button" value="Edit">
+        <input type="submit" value="Save">
+    </form>
+    <a href="/manage-staff">home</a>
+
+    <%-include("script-toggle-edit")%>
+
+</body>
+</html>
+

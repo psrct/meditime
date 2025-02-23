@@ -73,14 +73,14 @@ app.post('/login-staff', function(req, res){
       res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login-staff';</script> ")
     }else if(loginData.password != rows[0].password){
       res.send("<script>alert('รหัสผ่านไม่ถูกต้อง'); window.location.href = '/login-staff';</script> ")
-    }else if(loginData.username === "admin"){
+    }else if(loginData.username === "Dsompact "){
       req.session.user = {
         id: rows[0].doctor_id,
         username: rows[0].username,
         specialty: rows[0].specialty_id,
         usertype: "clinic_owner"
       }
-      res.redirect("/");
+      res.redirect("/manage-staff");
     }
     else{
       req.session.user = {
@@ -89,7 +89,7 @@ app.post('/login-staff', function(req, res){
         specialty: rows[0].specialty_id,
         usertype: "doctor"
       }
-      res.redirect("/");
+      res.redirect("/home-staff");
     }
   });
 });
@@ -99,8 +99,9 @@ app.get('/register', function(req, res){
 });
 
 app.post('/register', bypasslogin, function(req, res){
-  var cur_time = new Date().toUTCString();
-  console.log(cur_time);
+  var cur_time = new Date();
+  var time_conv = `${cur_time.getFullYear()}-`+`${cur_time.getMonth()+1}-`.padStart(3, "0")+`${cur_time.getDate()}`.padStart(2, "0")+` ${cur_time.getHours()}:${cur_time.getMinutes()}:${cur_time.getSeconds()}`;
+  console.log(time_conv);
 
   console.log(req.body);
   let registerData = {
@@ -115,29 +116,32 @@ app.post('/register', bypasslogin, function(req, res){
     console.log(registerData);  
     const sql = `insert into Patients(prename, firstname, lastname, birth_date, gender, register_datetime, username, password) 
     values("${registerData.prename}",
-     "${registerData.firstname}"),
-     "${registerData.lastname}"),
-     "${registerData.birth_date}"),
-     "${registerData.gender}"),
-     "${cur_time}"),
-     "${registerData.username}"),
-     "${registerData.password}")
-      `;
+     "${registerData.firstname}",
+     "${registerData.lastname}",
+     "${registerData.birth_date}",
+     "${registerData.gender}",
+     "${time_conv}",
+     "${registerData.username}",
+     "${registerData.password}")`;
     conn.run(sql, function(err){
       if (err) throw err;
       console.log("Add user successfully.");
     });
-    res.redirect('/');
+    res.redirect('/register');
 });
-
-app.get('/', checkLoggedIn, function(req, res){
-  res.render('home');
-})
 
 app.get('/logout', function(req, res){
   req.session.destroy();
   res.clearCookie('user');
   res.redirect('/');
+})
+
+app.get('/', checkLoggedIn, function(req, res){
+  res.render('home');
+})
+
+app.get('/home-staff', checkLoggedIn, function(req, res){
+  res.render('home-staff');
 })
 
 app.get('/profile', checkLoggedIn, function(req, res){
@@ -166,6 +170,43 @@ app.post('/profile', checkLoggedIn, function(req, res){
   conn.run(sql, function(err){
     if (err) throw err;
     res.redirect("/profile");
+    });
+})
+
+app.get('/manage-staff', checkLoggedIn, function(req, res){
+  const sql = `select * from Doctors`;
+  conn.all(sql, function(err, rows){
+    // console.log(rows);
+    res.render('manage-staff', {data : rows});
+    });
+})
+
+app.get('/edit-staff/:id', checkLoggedIn, function(req, res){
+  const sql = `select * from Doctors where doctor_id = ${req.params.id} `;
+  conn.all(sql, function(err, rows){
+    console.log(rows);
+    res.render('profile-staff', {data : rows});
+    });
+})
+
+app.post('/edit-staff/:id', checkLoggedIn, function(req, res){
+  let updateData = {
+    id : req.params.id,
+    prename : req.body.prename,
+    fname : req.body.firstname,
+    lname : req.body.lastname,
+    retire_date : req.body.retire_date,
+    gender : req.body.gender
+  }
+  const sql = `update Doctors set
+    prename = "${updateData.prename}",
+    firstname = "${updateData.fname}",
+    lastname = "${updateData.lname}",
+    gender = "${updateData.gender}"
+    where doctor_id = ${updateData.id} `;
+  conn.run(sql, function(err){
+    if (err) throw err;
+    res.redirect(`/edit-staff/${updateData.id}`);
     });
 })
 
