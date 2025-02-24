@@ -1,0 +1,87 @@
+<script>
+    function showForm() {
+        document.getElementById('serviceForm').style.display = 'block';
+    }
+
+    function hideForm() {
+        document.getElementById('serviceForm').style.display = 'none';
+    }
+</script>
+<style>
+    #serviceForm {
+        display: none;
+        margin-top: 20px;
+    }
+</style>
+<body>
+    <h1>Services</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Service</th>
+                <th>Service Category</th>
+                <th>Price</th>
+                <th>Duration</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% data.forEach((item)=> { %>
+                <tr>
+                    <td>
+                        <%= item.service_id%>
+                    </td>
+                    <td>
+                        <%= item.name%>
+                    </td>
+                    <td>
+                        <%= item.category_name%>
+                    </td>
+                    <td>
+                        <%= item.price%>
+                    </td>
+                    <td>
+                        <%= item.duration%>
+                    </td>
+                    <td>
+                        <% if (item.status === 'Active') { %>
+                            🟢 Active
+                        <% } else { %>
+                            🔴 Inactive
+                        <% } %>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+
+    <h2>Manage Services</h2>
+    <!-- ปุ่ม Add -->
+    <button onclick="showForm()">Add Service</button>
+    <button>Edit</button>
+    <button>Delete</button>
+
+    <!-- ฟอร์มเพิ่ม Service -->
+    <div id="serviceForm">
+        <form action="/add-service" method="POST">
+            <label for="serviceID">ID:</label>
+            <input type="text" id="service_id" name="ServiceID" required><br>
+            <label for="serviceName">Service Name:</label>
+            <input type="text" id="name" name="serviceName" required><br>
+            <label for="serviceCategory">Service Category:</label>
+            <input type="text" id="category_id" name="serviceCategory" required><br>
+            <label for="Price">Price:</label>
+            <input type="text" id="price" name="Price" required><br>
+            <label for="serviceDuration">Duration:</label>
+            <input type="text" id="service_name" name="serviceDuration" required><br>
+            <label for="serviceStatus">Status:</label>
+            <select name="serviceStatus" id="service_status">
+                <option value="Inactive">🔴 Inactive</option>
+                <option value="Active">🟢 Active</option>
+            </select><br>
+            <button type="submit">Confirm</button>
+            <button type="button" onclick="hideForm()">Cancel</button>
+        </form>
+    </div>
+</body>
