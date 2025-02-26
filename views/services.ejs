@@ -13,6 +13,38 @@
         display: none;
         margin-top: 20px;
     }
+    .circle {
+        margin-right: 10px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        animation: flashColor 2s infinite;
+      }@keyframes flashColor{
+        0%,100%{
+            background-color: red;
+        }
+        50%{
+            background-color: rgb(254, 194, 194);
+        }
+      }
+    .circle2 {
+        margin-right: 10px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        animation: flashColor2 2s infinite;
+      }@keyframes flashColor2{
+        0%,100%{
+            background-color: rgb(0, 255, 0);
+        }
+        50%{
+            background-color: rgb(197, 255, 197);
+        }
+      }
+    .flex{
+        display: flex;
+        align-items: center;
+    }
 </style>
 <body>
     <h1>Services</h1>
@@ -45,11 +77,11 @@
                     <td>
                         <%= item.duration%>
                     </td>
-                    <td>
+                    <td class="flex">
                         <% if (item.status === 'Active') { %>
-                            🟢 Active
+                            <div class="circle2"></div> Active
                         <% } else { %>
-                            🔴 Inactive
+                            <div class="circle"></div> Inactive
                         <% } %>
                     </td>
                 </tr>
