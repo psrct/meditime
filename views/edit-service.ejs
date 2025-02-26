@@ -1,0 +1,44 @@
+<%-include("head")%>
+
+    <style>
+        input, select {
+            font-size: 18px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+
+        .txtbox {
+            color: rgb(53, 72, 126);
+        }
+    </style>
+
+    <body>
+
+        <body>
+            <h2>Edit Service</h2>
+            <form action="/edit-service" method="post">
+                ServiceID : <input type="text" id="id" class="txtbox" value="<%= data.service_id%>" readonly placeholder="id"
+                    name="id"><br>
+                Name : <input type="text" id="name" class="txtbox" value="<%= data.name%>" readonly placeholder="name"
+                    name="serviceName"><br>
+                Category : <input type="text" id="category" class="txtbox" value="<%= data.category_id%>"
+                    readonly placeholder="category" name="serviceCategory"><br>
+                Price : <input type="text" id="price" class="txtbox" value="<%= data.price%>" readonly placeholder="price"
+                    name="price"><br>
+                Duration : <input type="text" id="duration" class="txtbox" value="<%= data.duration%>"
+                    readonly placeholder="duration" name="serviceDuration"><br>
+                Status : <select name="serviceStatus" id="service_status" readonly>
+                    <option value="<%= data.status%>">
+                        <%=data.status%>
+                    </option>
+                    <option value="Inactive">🔴 Inactive</option>
+                    <option value="Active">🟢 Active</option>
+                </select><br>
+                <input onclick="toggleEdit()" type="button" value="Edit" class="btn border">
+                <button class="btn border" type="submit">Save</button>
+                <a class="btn border" href="/showservices">Cancel</a>
+            </form>
+        </body>
+        <%-include("script-toggle-edit")%>
+
+            </html>

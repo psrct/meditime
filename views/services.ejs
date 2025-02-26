@@ -1,3 +1,4 @@
+<%-include("head")%>
 <script>
     function showForm() {
         document.getElementById('serviceForm').style.display = 'block';
@@ -58,21 +59,22 @@
 
     <h2>Manage Services</h2>
     <!-- ปุ่ม Add -->
-    <button onclick="showForm()">Add Service</button>
-    <button>Edit</button>
-    <button>Delete</button>
+    <button onclick="showForm()" class="btn border">Add Service</button>
+    <a href="/showservices/T01" class="btn border">Edit</a>
+    <a href="/deleteservice/T05" class="btn border">Delete</a>
+    
 
     <!-- ฟอร์มเพิ่ม Service -->
     <div id="serviceForm">
         <form action="/add-service" method="POST">
             <label for="serviceID">ID:</label>
-            <input type="text" id="service_id" name="ServiceID" required><br>
+            <input type="text" id="service_id" name="serviceID" required><br>
             <label for="serviceName">Service Name:</label>
             <input type="text" id="name" name="serviceName" required><br>
             <label for="serviceCategory">Service Category:</label>
             <input type="text" id="category_id" name="serviceCategory" required><br>
             <label for="Price">Price:</label>
-            <input type="text" id="price" name="Price" required><br>
+            <input type="text" id="price" name="price" required><br>
             <label for="serviceDuration">Duration:</label>
             <input type="text" id="service_name" name="serviceDuration" required><br>
             <label for="serviceStatus">Status:</label>
