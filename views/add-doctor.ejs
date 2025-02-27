@@ -1,0 +1,27 @@
+<%-include("head")%>
+
+<body>
+    <form action="/add-staff" method="post">
+        <input type="text" name="username" placeholder="Username"><br>
+        <input type="password" name="password" placeholder="Password"><br>
+        <select id="prename" name="prename">
+            <option value="นายแพทย์">นายแพทย์</option>
+            <option value="แพทย์หญิง">แพทย์หญิง</option>
+        </select>
+        <input type="text" name="firstname" placeholder="Enter your FirstName">
+        <input type="text" name="lastname" placeholder="Enter your LastName"><br>
+        <select id="gender" name="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+        <select id="specialty" name="specialty">
+            <% data.forEach((item) => { %>
+                <option value="<%= item.specialty_id %>">
+                    <%= item.name %>
+                </option>
+            <% }); %>
+        </select>
+        <input type="submit" value="Add Doctor">
+    </form>
+</body>
+</html>

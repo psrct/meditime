@@ -4,10 +4,10 @@ const port = 3000
 const path = require('path');
 const bcrypt = require('bcrypt');
 
-const conn = require('./database.js');
+const db = require('./database.js');
 const session = require('express-session');
 const { checkLoggedIn, bypasslogin } = require('./middleware.js');
-const { time } = require('console');
+
 
 app.use(express.static('webpages'));
 app.set('view engine', 'ejs');
@@ -39,7 +39,7 @@ app.post('/login', function(req, res){
     password: req.body.password
   }
   const sql = `select * from Patients where username = "${loginData.username}" `;
-  conn.all(sql, function(err, rows){
+  db.all(sql, function(err, rows){
     // console.log(rows);
     if(rows.length < 1){
       res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login';</script> ")
@@ -67,7 +67,7 @@ app.post('/login-staff', function(req, res){
     password: req.body.password
   }
   const sql = `select * from Doctors where username = "${loginData.username}" `;
-  conn.all(sql, function(err, rows){
+  db.all(sql, function(err, rows){
     console.log(rows);
     if(rows.length < 1){
       res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login-staff';</script> ")
@@ -123,7 +123,7 @@ app.post('/register', bypasslogin, function(req, res){
      "${time_conv}",
      "${registerData.username}",
      "${registerData.password}")`;
-    conn.run(sql, function(err){
+    db.run(sql, function(err){
       if (err) throw err;
       console.log("Add user successfully.");
     });
@@ -147,7 +147,7 @@ app.get('/home-staff', checkLoggedIn, function(req, res){
 app.get('/profile', checkLoggedIn, function(req, res){
   console.log(`this is session for user ${req.session.user}`);
   const sql = `select prename, firstname, lastname, birth_date, gender, username from Patients where patient_id = ${req.session.user.id} `;
-  conn.all(sql, function(err, rows){
+  db.all(sql, function(err, rows){
     console.log(rows);
     res.render('profile', {data : rows});
     });
@@ -167,7 +167,7 @@ app.post('/profile', checkLoggedIn, function(req, res){
     lastname = "${updateData.lname}",
     gender = "${updateData.gender}"
     where patient_id = ${req.session.user.id} `;
-  conn.run(sql, function(err){
+  db.run(sql, function(err){
     if (err) throw err;
     res.redirect("/profile");
     });
@@ -175,7 +175,7 @@ app.post('/profile', checkLoggedIn, function(req, res){
 
 app.get('/manage-staff', checkLoggedIn, function(req, res){
   const sql = `select * from Doctors`;
-  conn.all(sql, function(err, rows){
+  db.all(sql, function(err, rows){
     // console.log(rows);
     res.render('manage-staff', {data : rows});
     });
@@ -183,7 +183,7 @@ app.get('/manage-staff', checkLoggedIn, function(req, res){
 
 app.get('/edit-staff/:id', checkLoggedIn, function(req, res){
   const sql = `select * from Doctors where doctor_id = ${req.params.id} `;
-  conn.all(sql, function(err, rows){
+  db.all(sql, function(err, rows){
     console.log(rows);
     res.render('profile-staff', {data : rows});
     });
@@ -204,7 +204,7 @@ app.post('/edit-staff/:id', checkLoggedIn, function(req, res){
     lastname = "${updateData.lname}",
     gender = "${updateData.gender}"
     where doctor_id = ${updateData.id} `;
-  conn.run(sql, function(err){
+  db.run(sql, function(err){
     if (err) throw err;
     res.redirect(`/edit-staff/${updateData.id}`);
     });
