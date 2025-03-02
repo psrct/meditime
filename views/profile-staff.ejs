@@ -4,26 +4,61 @@
         font-size: 18px;
     }
 
-    .txtbox{
-        color: rgb(53, 72, 126);
+    .txtbox, .option, .fix{
+        color: rgb(157, 157, 157);
     }
+
 </style>
 <body>
 
-    <form action="/edit-staff/<%= data[0].doctor_id %>" method="post">
-        <input id="username" class="txtbox" name="username" value="<%=data[0].username%>" placeholder="username" readonly><br> <br>
-        <input id="prename" class="txtbox" name="prename" value="<%=data[0].prename%>" placeholder="prename" readonly><br><br>
-        <input id="firstname" class="txtbox" name="firstname" value="<%=data[0].firstname%>" placeholder="firstname" readonly><br><br>
-        <input id="lastname" class="txtbox" name="lastname" value="<%=data[0].lastname%>" placeholder="lastname" readonly><br><br>
-        <input id="retire_date" class="txtbox" name="retire_date" value="<%=data[0].retire_date%>" placeholder="retire_date" readonly><br><br>
-        <input id="gender" class="txtbox" name="gender" value="<%=data[0].gender%>" placeholder="gender" readonly>
-        <input id="specialty_id" class="txtbox" name="specialty_id" value="<%=data[0].specialty_id%>" placeholder="specialty_id" readonly>
+    <form action="/edit-staff/<%= data.docinfo[0].doctor_id %>" method="post">
+        <input id="username" class="txtbox" name="username" value="<%=data.docinfo[0].username%>" placeholder="username" readonly><br> <br>
+        <input id="password" class="txtbox" name="password" value="<%=data.docinfo[0].password%>" placeholder="password" readonly><br> <br>
+        <input id="prename" class="fix" name="prename" value="<%=data.docinfo[0].prename%>" placeholder="prename" readonly><br><br>
+        <!-- <select id="prename" class="option" name="prename" disabled>;
+            <option value="นายแพทย์" id="mister">นายแพทย์</option>
+            <option value="แพทย์หญิง" id="miss">แพทย์หญิง</option>
+        </select> -->
+        <input id="firstname" class="txtbox" name="firstname" value="<%=data.docinfo[0].firstname%>" placeholder="firstname" readonly><br><br>
+        <input id="lastname" class="txtbox" name="lastname" value="<%=data.docinfo[0].lastname%>" placeholder="lastname" readonly><br><br>
+        <input id="contact_number" class="txtbox" name="contact_number" value="<%=data.docinfo[0].contact_number%>" placeholder="contact_number" readonly><br><br>
+        <input type="date" id="retire_date" class="txtbox" name="retire_date" value="<%=data.docinfo[0].retire_date%>" placeholder="retire_date" readonly><br><br>
+        <!-- <input id="gender" class="txtbox" name="gender" value="<%=data.gender%>" placeholder="gender" readonly> -->
+        <select id="gender" class="option" name="gender" disabled>
+            <option value="Male" id="male">Male</option>
+            <option value="Female" id="female">Female</option>
+        </select>
+        <select class="option" name="specialty_id" id="specialty_list">
+            <% data.specialtyinfo.forEach((item) => { %>
+                <option value="<%= item.specialty_id %>" id="<%=item.specialty_id%>"><%= item.name %></option>
+           <% }) %>
+        </select>
+        <!-- <input id="specialty_id" class="txtbox" name="specialty_id" value="<%=data.docinfo[0].specialty_id%>" placeholder="specialty_id" readonly> -->
         <input onclick="toggleEdit()" type="button" value="Edit">
         <input type="submit" value="Save">
     </form>
     <a href="/manage-staff">home</a>
 
     <%-include("script-toggle-edit")%>
+    <script>
+        var gender = "<%=data.docinfo[0].gender%>";
+
+        // if(prename == "นายแพทย์"){
+        //     document.getElementById("mister").setAttribute("selected", true);
+        //     document.getElementById("male").setAttribute("selected", true);
+        // }else{
+        //     document.getElementById("miss").setAttribute("selected", true);
+        //     document.getElementById("female").setAttribute("selected", true);
+        // }
+        console.log("gender", gender);
+        if(gender == "Male"){
+            document.getElementById("male").setAttribute("selected", true);
+        }else{
+            document.getElementById("female").setAttribute("selected", true);
+        }
+
+        document.getElementById("<%=data.docinfo[0].specialty_id%>").setAttribute("selected", true);
+    </script>
 
 </body>
 </html>

@@ -11,39 +11,39 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>doctor_id</th>
-                    <th>prename</th>
+                    <th>Name</th>
+                    <!-- <th>prename</th>
                     <th>firstname</th>
-                    <th>lastname</th>
-                    <th>hire_date</th>
-                    <th>retire_date</th>
-                    <th>gender</th>
-                    <th>specialty_id</th>
-                    <th>username</th>
-                    <th>password</th>
-                    <th>Action</th>
+                    <th>lastname</th> -->   
+                    <th>Hire Date</th>
+                    <th>Retire Date</th>
+                    <th>Contact Number</th>
+                    <th>Specialty</th>
+                    <th>Username</th>
+                    <th>Password</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <% data.forEach((item) => { %>
                     <tr>
-                        <td><%= item.doctor_id %></td>
-                        <td><%= item.prename %></td>
-                        <td><%= item.firstname %></td>
-                        <td><%= item.lastname %></td>
+                        <td><%= item.prename %> <%= item.firstname %> <%= item.lastname %></td>
+                        <!-- <td><%= item.firstname %></td>
+                        <td><%= item.lastname %></td> -->
                         <td><%= item.hire_date %></td>
                         <td><%= item.retire_date %></td>
-                        <td><%= item.gender %></td>
-                        <td><%= item.specialty_id %></td>
+                        <td><%= item.contact_number %></td>
+                        <td><%= item.name %></td>
                         <td><%= item.username %></td>
                         <td><%= item.password %></td>
-                        <td><a href="/edit-staff/<%= item.doctor_id %>" class="btn btn-primary">Edit Info</a></td>
-                        <td><a href="/remove-staff/<%= item.doctor_id %>" class="btn btn-primary">Remove Staff</a></td>
+                        <td><a href="/edit-staff/<%= item.doctor_id %>" class="btn btn-primary">Edit Info</a> <br><br> <a href="/remove-staff/<%= item.doctor_id %>" class="btn btn-primary">Remove Staff</a></td>
                     
                     </tr>
                 <% }) %>
             </tbody>
+            <script>
+                console.log("<%=data%>");
+            </script>
         </table>
             
         <a href="/logout">Logout</a><br>
