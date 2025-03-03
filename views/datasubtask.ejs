@@ -1,0 +1,48 @@
+<%- include("head") %>
+
+    <body>
+        <h1>Table Of Subtasks</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>SubtaskNumber</th>
+                    <th>RoomID</th>
+                    <th>DoctorID</th>
+                    <th>ServiceID</th>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <% data.forEach((item)=> { %>
+                    <tr>
+                        <td>
+                            <%= item.task_id %>
+                        </td>
+                        <td>
+                            <%= item.subtask_no %>
+                        </td>
+                        <td>
+                            <%= item.room_id %>
+                        </td>
+                        <td>
+                            <%= item.doctor_id %>
+                        </td>
+                        <td>
+                            <%= item.service_id %>
+                        </td>
+                        <td>
+                            <%= item.start_datetime %>
+                        </td>
+                        <td>
+                            <%= item.end_datetime %>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+    </body>
+
+    </html>
