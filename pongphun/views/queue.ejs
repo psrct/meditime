@@ -7,25 +7,24 @@
 </head>
 <body>
     <div id="for-alert" style="height:98vh; width:98vw; position: absolute;"></div>
-    <a id="queue_count" style="font-size:2vw; font-weight:bold;">จำนวนคิวและนัดในวันนี้: -</a><br>
+    <a id="queue_count" style="font-size:2vw; font-weight:bold;">จำนวนคิวและนัดทั้งหมดของโรงพยาบาลในวันนี้: -</a><br>
     <a>วันที่ต้องการจองคิว : </a><input id="date_input" type="date" onchange="changeDate()"><br>
-    <a>หมอ : </a><input list="doctors_data" id="doctor_selected" type="text" onchange="doctors_filter();updateTasksAndServices();updateClockData();updateDuration();updateAllPrice();"><br>
+    <a>หมอ : </a><input list="doctors_data" id="doctor_selected" type="text" oninput="doctors_filter();updateTasksAndServices();canService();updateDuration();updateAllPrice();updateClockData();"><br>
     <datalist id="doctors_data"></datalist>
     <div id="clock-time" style="width:30%; aspect-ratio: 1; margin-bottom:3vw; justify-content:center; display: flexbox; align-items: center;">
         <canvas id="clocktext" width="400" height="400" style="position:absolute; width:30%; aspect-ratio:1;"></canvas>
     </div>
     <div id="queue-below-container">
-        <a>เวลาที่ต้องการจองคิว : </a><input class="start_time_input" id="start_time_input" type="time" oninput="updateDuration()">
+        <a>เวลาที่ต้องการจองคิว : </a><input class="start_time_input" id="start_time_input" type="time" oninput="updateDuration();updateClockData();">
         <a>ถึง : </a><input class="end_time_input" id="end_time_input" type="time" disabled><br>
         <div id="services_container">
             <!-- Service Select Appear Here! -->
         </div><br>
+        <button id="add_service_button" onclick="addService();">+</button>
+        <br>
         <a>ราคารวมบริการทั้งหมด : </a><input type="text" id="all-price-count" placeholder="0 บาท" disabled>
-        <br>
-        <button id="add_service_button" onclick="addService()">+</button>
-        <br>
         
-        <br><br>
+        <br><br><br>
         <button id="queue_button" onclick="queue()">จองคิว</button>
     </div>
         <button id="cancel_button">ยกเลิก</button>
@@ -34,15 +33,19 @@
         <%-include('scripts/RadianFormat')%>
         <%-include('scripts/DateFormat')%>
 
+        let can_queue = true;
+
         document.getElementById("for-alert").style.visibility = "hidden";
 
         document.getElementById("date_input").value = DateToDateString(new Date("<%=search_date%>"));
+
         function changeDate() {
             window.location.href = `/queue/${document.getElementById("date_input").value}`;
         }
 
         let radianList = [];
         let current_tasks_list = [];
+
 
 
         // Creating clock and number
@@ -86,18 +89,31 @@
 
             const timeList = [];
             radianList = [];
+
+            // Already Tasks Queue / Appointment
             current_tasks_list.forEach(item => {
-                timeList.push({start: new Date(item.start_datetime), end: new Date(item.end_datetime)});
+                timeList.push({start: new Date(item.start_datetime),
+                    end: new Date(item.end_datetime),
+                    status: "task"});
             });
+
+            // User Selected Queue (If you can queue)
+            if (can_queue) {
+                const temToday = DateToDateString(getCurrentTHDatetime());
+                timeList.push({start: new Date(temToday + " " + document.getElementById("start_time_input").value + ":00"),
+                        end: new Date(temToday + " " + document.getElementById("end_time_input").value + ":00"),
+                        status: "selected"});
+            }
 
             contextClockText.beginPath();
             contextClockText.moveTo(centerX, centerY);
-
+            
             timeList.forEach(item => {
                 radianList.push({start: degreesToRadians(180+((item.start.getHours()-9)*30)+(item.start.getMinutes()*0.5)),
-                                end: degreesToRadians(180+((item.end.getHours()-9)*30)+(item.end.getMinutes()*0.5))});
+                                end: degreesToRadians(180+((item.end.getHours()-9)*30)+(item.end.getMinutes()*0.5)),
+                                status: item.status});
             });
-
+            
             drawClock();
         }
 
@@ -105,28 +121,36 @@
             // Disable Queue (Clinic Closed)
             contextClockText.beginPath();
             contextClockText.moveTo(centerX, centerY);
-            contextClockText.arc(centerX, centerY, radius-15, degreesToRadians(150), degreesToRadians(180));
+            contextClockText.arc(centerX, centerY, radius-15, degreesToRadians(150), degreesToRadians(180)); // Clinic Closed
             contextClockText.closePath();
 
             contextClockText.fillStyle = 'gray';
             contextClockText.fill();
 
-            // Already Queue
+            // Disable Queue (Break Time)
+            contextClockText.beginPath();
+            contextClockText.moveTo(centerX, centerY);
+            contextClockText.arc(centerX, centerY, radius-15, degreesToRadians(270), degreesToRadians(300)); // Break Time
+            contextClockText.closePath();
+
+            contextClockText.fillStyle = 'gray';
+            contextClockText.fill();
+
+            // Already Tasks Queue / Appointment   &   User Selected Queue
             radianList.forEach(item => {
                 contextClockText.beginPath();
                 contextClockText.moveTo(centerX, centerY);
-                contextClockText.arc(centerX, centerY, radius-15, item.start, item.end);
+                contextClockText.arc(centerX, centerY, (item.status == "task") ? radius-15 : radius-30, item.start, item.end);
                 contextClockText.closePath();
 
-                contextClockText.fillStyle = 'red';
+                contextClockText.fillStyle = item.status == "task" ? "red" : "green";
                 contextClockText.fill();
             });
-
-            // User Queue
         }
         updateClockData();
 
         const services_container = document.getElementById("services_container");
+        const services_div_list = services_container.children;
 
         const services_data = <%- JSON.stringify(services_data) %>;
         const doctors_data = <%- JSON.stringify(doctors_data) %>;
@@ -149,24 +173,10 @@
 
         let services_data_sorted = [];
 
-        // subtasks_data
-        for (let i = 0; i < subtasks_data.length; i++) {
-            let start_datetime; let end_datetime;
-            if (subtasks_data[i].subtask_no != 1) {
-                start_datetime = new Date(subtasks_data[i-1].end_datetime);
-            } else {
-                start_datetime = new Date(tasks_data.find(item => item.task_id === subtasks_data[i].task_id).start_datetime);
-            }
-            end_datetime = new Date(start_datetime);
-            end_datetime.setMinutes(end_datetime.getMinutes() + services_data.find(item => item.service_id == subtasks_data[i].service_id).duration);
-            
-            subtasks_data[i].start_datetime = start_datetime;
-            subtasks_data[i].end_datetime = end_datetime;
-        }
-
         let services_count = 0;
 
         function services_filter(id) {
+            if (!can_queue) return;
             const temDiv = document.getElementById(id);
             const tem_services_datalist = temDiv.querySelector("#services_data");
 
@@ -205,10 +215,8 @@
                     }
                 });
             }
-
-            const divAll = services_container.children;
             
-            Array.from(divAll).forEach(function(item) {
+            Array.from(services_div_list).forEach(function(item) {
                 services_filter(item.id);
             });
         }
@@ -230,57 +238,59 @@
         doctors_filter();
 
         function addService() {
+            if (!can_queue) return;
             services_count += 1;
             const temDiv = document.createElement("div");
-            temDiv.innerHTML = `<input list="services_data" class="service_selected" type="text" placeholder="ชื่อบริการ..." onchange="services_filter(${services_count});updateDuration();updateAllPrice();">\
+            temDiv.innerHTML = `<a>บริการ: </a><input list="services_data" class="service_selected" type="text" placeholder="โปรดเลือกหมอข้างบน" onchange="services_filter(${services_count});updateServiceData(${services_count});updateDuration();updateAllPrice();updateClockData();" disabled>\
                                 <datalist id="services_data"></datalist>\
                                 <a>ระยะเวลาบริการ : </a><input class="duration_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>\
                                 <a>ราคาบริการ : </a><input class="price_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>` +
-                                (services_count != 1 ? `<button onclick="removeService(${services_count})">-</button>` : ``);
+                                (services_count != 1 ? `<button onclick="removeService(${services_count});updateDuration();updateAllPrice();updateClockData();">-</button>` : ``);
             temDiv.id = services_count;
 
             services_container.appendChild(temDiv);
             
             services_filter(services_count);
-
-            document.getElementById(services_count).querySelector(".service_selected").addEventListener("input", function() {
-                const temDiv = document.getElementById(services_count);
-
-                const service_selected = temDiv.querySelector(".service_selected").value;
-                const service_selectedOption = [...temDiv.querySelector("#services_data").options]
-                    .find(option => option.value === service_selected);
-                
-                if (service_selectedOption) {
-                    const temPrice = service_selectedOption.dataset.price.toLocaleString() + " บาท";
-                    const temDuration = service_selectedOption.dataset.duration;
-                    const temDurationString = ((temDuration >= 60) ? ( Math.floor( temDuration / 60) ) + " ชั่วโมง " : "") + 
-                                        ( Math.floor( temDuration % 60) ) + " นาที";
-                    temDiv.querySelector(".duration_input").placeholder = temDurationString;
-                    temDiv.querySelector(".price_input").placeholder = temPrice;
-                } else {
-                    temDiv.querySelector(".duration_input").placeholder = "ไม่พบข้อมูลบริการ";
-                    temDiv.querySelector(".price_input").placeholder = "ไม่พบข้อมูลบริการ";
-                }
-            });
+            canServiceID(services_count);
         }
         addService();
 
+        function updateServiceData(id) {
+            if (!can_queue) return;
+            const temDiv = document.getElementById(id);
+
+            const service_selected = temDiv.querySelector(".service_selected").value;
+            const service_selectedOption = [...temDiv.querySelector("#services_data").options]
+                .find(option => option.value === service_selected);
+            
+            if (service_selectedOption) {
+                const temPrice = service_selectedOption.dataset.price.toLocaleString() + " บาท";
+                const temDuration = service_selectedOption.dataset.duration;
+                const temDurationString = ((temDuration >= 60) ? ( Math.floor( temDuration / 60) ) + " ชั่วโมง " : "") + 
+                                    ( Math.floor( temDuration % 60) ) + " นาที";
+                temDiv.querySelector(".duration_input").placeholder = temDurationString;
+                temDiv.querySelector(".price_input").placeholder = temPrice;
+            } else {
+                temDiv.querySelector(".duration_input").placeholder = "ไม่พบข้อมูลบริการ";
+                temDiv.querySelector(".price_input").placeholder = "ไม่พบข้อมูลบริการ";
+            }
+        }
+
         function removeService(id) {
-            services_count -= 1;
+            if (!can_queue) return;
             const temDiv = document.getElementById(id);
             services_container.removeChild(temDiv);
         }
 
         function findQueueCount() {
-            document.getElementById("queue_count").innerHTML = "จำนวนคิวและนัดในวันนี้: " + <%= tasks_data.length %>;
+            document.getElementById("queue_count").innerHTML = "จำนวนคิวและนัดทั้งหมดของโรงพยาบาลในวันนี้: " + <%= tasks_data.length %>;
         }
         findQueueCount();
 
         function queue() {
             const subtasksList = [];
-            const divAll = services_container.children;
             
-            Array.from(divAll).forEach(function(item) {
+            Array.from(services_div_list).forEach(function(item) {
                 const service_selected = item.querySelector(".service_selected").value;
                 const service_selectedOption = [...item.querySelector("#services_data").options]
                     .find(option => option.value === service_selected);
@@ -288,15 +298,22 @@
                 if (service_selectedOption) {
                     subtasksList.push(service_selectedOption.dataset.id);
                 }
-            })
+            });
 
-            const queueData = {
-                date: document.getElementById("date_input").value,
-                doctor_id: document.getElementById("doctor_selected").value,
-                start_time: document.getElementById("start_time_input").value,
-                subtasks: subtasksList
+            const doctor_selectedOption = [...document.getElementById("doctors_data").options]
+                .find(option => option.value === document.getElementById("doctor_selected").value);
+
+            let doctor_id_input;
+            if (doctor_selectedOption) {
+                doctor_id_input = doctor_selectedOption.dataset.id;
+            }
+
+            let queueData = {
+                    date: document.getElementById("date_input").value,
+                    doctor_id: doctor_id_input,
+                    start_time: document.getElementById("start_time_input").value,
+                    subtasks: subtasksList
             };
-            console.log(JSON.stringify(queueData))
 
             fetch('/queue-insert', {
                 method: 'POST',
@@ -317,11 +334,12 @@
 
         // Update Duration
         function updateDuration() {
+            if (!can_queue) return;
             let destTime = new Date(`<%-JSON.stringify(search_date)%>` + document.getElementById("start_time_input").value + ":00");
 
             if (isNaN(destTime.getTime())) return; 
-            const divAll = services_container.children;
-            Array.from(divAll).forEach(function(item) {
+
+            Array.from(services_div_list).forEach(function(item) {
                 if (item.querySelector(".duration_input").placeholder.split(" ")[1] === "นาที") {
                     destTime.setMinutes(destTime.getMinutes() + parseInt(item.querySelector(".duration_input").placeholder.split(" ")[0]));
                 } else {
@@ -335,10 +353,10 @@
 
         // Update All Price Count
         function updateAllPrice() {
+            if (!can_queue) return;
             let allprice = 0;
 
-            const divAll = services_container.children;
-            Array.from(divAll).forEach(function(item) {
+            Array.from(services_div_list).forEach(function(item) {
                 if (item.querySelector(".price_input").placeholder.split(" ")[1] === "บาท") {
                     allprice += parseInt(item.querySelector(".price_input").placeholder.split(" ")[0]);
                 }
@@ -346,9 +364,49 @@
             document.getElementById("all-price-count").placeholder = allprice + " บาท";
         }
 
-        // Check Can Queue
-        if (new Date("<%=search_date%>") < new Date(DateToDateString(getCurrentTHDatetime()))) {
+        // Check Can Service?
+        function canService() {
+            if (services_data_sorted.length == 0) {
+                Array.from(services_div_list).forEach(function(item) {
+                    item.querySelector(".service_selected").placeholder = "โปรดเลือกหมอข้างบน";
+                    item.querySelector(".service_selected").value = "";
+                    item.querySelector(".service_selected").disabled = true;
+
+                    updateServiceData(item.id);
+                });
+            } else {
+                Array.from(services_div_list).forEach(function(item) {
+                    item.querySelector(".service_selected").placeholder = "ชื่อบริการ...";
+                    item.querySelector(".service_selected").disabled = false;
+
+                    updateServiceData(item.id);
+                });
+            }
+        }
+
+        function canServiceID(id) {
+            const temDiv = document.getElementById(id);
+
+            if (services_data_sorted.length == 0) {
+                temDiv.querySelector(".service_selected").placeholder = "โปรดเลือกหมอข้างบน";
+                temDiv.querySelector(".service_selected").value = "";
+                temDiv.querySelector(".service_selected").disabled = true;
+
+                updateServiceData(id);
+            } else {
+                temDiv.querySelector(".service_selected").placeholder = "ชื่อบริการ...";
+                temDiv.querySelector(".service_selected").disabled = false;
+
+                updateServiceData(id);
+            }
+        }
+        
+        // Check Can Queue On This Date?
+        if (new Date(`<%=search_date%> 07:00:00`).getTime() < new Date(DateToDateString(new Date())).getTime()) {
             document.getElementById("queue-below-container").innerHTML = "ไม่สามารถจองคิวในวันที่ผ่านมาแล้วได้";
+            can_queue = false;
+        } else {
+            can_queue = true;
         }
     </script>
 </body>
