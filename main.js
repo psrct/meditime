@@ -76,7 +76,7 @@ app.post('/login-staff', function(req, res){
       res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login-staff';</script> ")
     }else if(loginData.password != rows[0].password){
       res.send("<script>alert('รหัสผ่านไม่ถูกต้อง'); window.location.href = '/login-staff';</script> ")
-    }else if(loginData.username === "Dsompact "){
+    }else if(loginData.username === "Dsompact"){
       req.session.user = {
         id: rows[0].doctor_id,
         username: rows[0].username,
