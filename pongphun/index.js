@@ -236,7 +236,7 @@ app.post('/queue-insert', function (req, res) {
         
         // Start Queue
 
-        const patient_id = 1; // ต้องเปลื่ยนเป็น ${req.session.user.id}
+        const patient_id = ${req.session.user.id};
         const queue_tasks_sql = ` INSERT INTO Tasks (patient_id, start_datetime, end_datetime, is_completed, is_paid) VALUES\
                                 (${patient_id},\
                                 "${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}",\
