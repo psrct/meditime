@@ -101,7 +101,9 @@ app.get('/doctor_appointment', function (req, res) {
 });
 
 app.get('/queue', function (req, res) {
-  // Automatically to today date
+
+  // นำไปสู่หน้าจองคิวในวันนี้ทันที
+
   const todayDate = new Date();
   res.redirect(`/queue/${DateToDateString(todayDate)}`);
 });
@@ -170,100 +172,116 @@ app.post('/queue-insert', function (req, res) {
       const start_break_time = new Date(`${req.body.date} 12:00:00`);
       const end_break_time = new Date(`${req.body.date} 13:00:00`);
   
-      // Avoid Queue At Clinic Closed
+      // ป้องกันการจองคิวในช่วงคลินิกปิดให้บริการ
       if (!(startDatetimeQueue >= open_clinic_time && endDatetimeQueue <= close_clinic_time)) {
         return res.send(feedback("การดำเนินการล้มเหลว: คลินิกเปิดให้บริการตั้งแต่เวลา 9:00 ถึง 20:00 น. เท่านั้น"));
       }
 
-      // Avoid Queue At Break Time
+      // ป้องกันการจองคิวในเวลาพักเที่ยง
       if (!(endDatetimeQueue <= start_break_time || startDatetimeQueue >= end_break_time)) {
         return res.send(feedback("การดำเนินการล้มเหลว: ไม่สามารถจองคิวในเวลาพักเที่ยงได้ตั้งแต่ 12:00 ถึง 13:00 น."));
       }
   
-      // Avoid Queue Already Passed
+      // ป้องกันการจองคิวในอดีต
       if (startDatetimeQueue < todayDate) { 
         return res.send(feedback("การดำเนินการล้มเหลว: โปรดอย่าจองคิวในอดีต"));
       }
-  
-      // Avoid Queue Time That Already Have Queue
-      const collision_subtasks_sql = ` SELECT task_id, subtask_no, room_id, doctor_id, service_id, start_datetime, end_datetime FROM Subtasks\
-                                    WHERE doctor_id = ${req.body.doctor_id}\
-                                    AND DATETIME(start_datetime) < DATETIME("${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}")\
-                                    AND DATETIME(end_datetime) > DATETIME("${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}"); `;
-      
-      db.all(collision_subtasks_sql, (collision_subtasks_err, collision_subtasks_rows) => {
-        if (collision_subtasks_err) throw collision_subtasks_err;
 
-        if (collision_subtasks_rows.length > 0) {
-          return res.send(feedback("การดำเนินการล้มเหลว: การจองคิวของคุณมีการทับซ้อนเวลากับคิวก่อนหน้า"));
+      // ป้องกันผู้ป่วยจองคิวชนกับคิวอื่นที่ตนเองจองไว้
+      const self_collision_subtasks_sql = ` SELECT s.task_id, s.subtask_no, s.room_id, s.doctor_id, s.service_id, s.start_datetime, s.end_datetime FROM Subtasks s\
+                                            JOIN Tasks t\
+                                            USING (task_id)\
+                                            WHERE t.patient_id = ${req.session.user.id}\
+                                            AND DATETIME(s.start_datetime) < DATETIME("${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}")\
+                                            AND DATETIME(s.end_datetime) > DATETIME("${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}"); `;
+  
+      db.all(self_collision_subtasks_sql, (self_collision_subtasks_err, self_collision_subtasks_rows) => {
+        if (self_collision_subtasks_err) throw self_collision_subtasks_err;
+        if (self_collision_subtasks_rows.length > 0) {
+          return res.send(feedback("การดำเนินการล้มเหลว: คิวหรือนัดที่มีอยู่แล้วของคุณทับซ้อนกับช่วงเวลาที่ต้องการจองคิว"));
         }
-  
-        // Find Available Room
 
-        let room_check_message;
-        let inactive_room_sql;
 
-        for (let i = 0; i < insert_subtasks.length; i++) {
-          inactive_room_sql = ` SELECT DISTINCT r.room_id, r.name FROM Rooms r\
-                            LEFT JOIN Subtasks\ s
-                            ON (r.room_id = s.room_id)\
-                            AND DATETIME(start_datetime) < DATETIME("${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}")\
-                            AND DATETIME(end_datetime) > DATETIME("${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}")\
-                            WHERE s.room_id IS NULL\
-                            AND r.category_id = ${insert_subtasks[i].category_id}\
-                            ORDER BY r.room_id ASC; `;
-          
-          db.all(inactive_room_sql, (inactive_room_err, inactive_room_rows) => {
-            if (inactive_room_err) throw inactive_room_err;
+        // ป้องกันผู้ป่วยจองคิวชนกับคิวที่มีอยู่แล้ว
+        const collision_subtasks_sql = ` SELECT task_id, subtask_no, room_id, doctor_id, service_id, start_datetime, end_datetime FROM Subtasks\
+                                        WHERE doctor_id = ${req.body.doctor_id}\
+                                        AND DATETIME(start_datetime) < DATETIME("${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}")\
+                                        AND DATETIME(end_datetime) > DATETIME("${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}"); `;
+        
+        db.all(collision_subtasks_sql, (collision_subtasks_err, collision_subtasks_rows) => {
+          if (collision_subtasks_err) throw collision_subtasks_err;
 
-            if (inactive_room_rows.length == 0) {
-              room_check_message = `การดำเนินการล้มเหลว: ไม่มีห้องว่างสำหรับบริการ "${insert_subtasks[i].service_name}" ในเวลาดังกล่าว`;
-            } else {
-              insert_subtasks[i].room_id = inactive_room_rows[0].room_id;
+          if (collision_subtasks_rows.length > 0) {
+            return res.send(feedback("การดำเนินการล้มเหลว: การจองคิวของคุณมีการทับซ้อนเวลากับคิวก่อนหน้า"));
+          }
+    
+          // Find Available Room
+
+          let room_check_message;
+          let inactive_room_sql;
+
+          for (let i = 0; i < insert_subtasks.length; i++) {
+            inactive_room_sql = ` SELECT DISTINCT r.room_id, r.name FROM Rooms r\
+                              LEFT JOIN Subtasks\ s
+                              ON (r.room_id = s.room_id)\
+                              AND DATETIME(start_datetime) < DATETIME("${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}")\
+                              AND DATETIME(end_datetime) > DATETIME("${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}")\
+                              WHERE s.room_id IS NULL\
+                              AND r.category_id = ${insert_subtasks[i].category_id}\
+                              ORDER BY r.room_id ASC; `;
+            
+            db.all(inactive_room_sql, (inactive_room_err, inactive_room_rows) => {
+              if (inactive_room_err) throw inactive_room_err;
+
+              if (inactive_room_rows.length == 0) {
+                room_check_message = `การดำเนินการล้มเหลว: ไม่มีห้องว่างสำหรับบริการ "${insert_subtasks[i].service_name}" ในเวลาดังกล่าว`;
+              } else {
+                insert_subtasks[i].room_id = inactive_room_rows[0].room_id;
+              }
+            });
+
+            if (room_check_message) {
+              break;
             }
-          });
+          }
 
           if (room_check_message) {
-            break;
+            return res.send(feedback(room_check_message));
           }
-        }
-
-        if (room_check_message) {
-          return res.send(feedback(room_check_message));
-        }
 
 
-        
-        // Start Queue
+          
+          // Start Queue
 
-        const patient_id = ${req.session.user.id};
-        const queue_tasks_sql = ` INSERT INTO Tasks (patient_id, start_datetime, end_datetime, is_completed, is_paid) VALUES\
-                                (${patient_id},\
-                                "${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}",\
-                                "${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}",\
-                                "No",\
-                                "No"); `;
-        
-        db.run(queue_tasks_sql, function(queue_tasks_err) {
-          if (queue_tasks_err) throw queue_tasks_err;
-    
-          for (let i = 0; i < insert_subtasks.length; i++) {
-            const queue_subtasks_sql = ` INSERT INTO Subtasks (task_id, subtask_no, room_id, doctor_id, service_id, start_datetime, end_datetime) VALUES\
-                                      (${this.lastID},\
-                                      ${i+1},\
-                                      "${insert_subtasks[i].room_id}",\
-                                      ${req.body.doctor_id},\
-                                      "${insert_subtasks[i].service_id}",\
-                                      "${DateToDateString(insert_subtasks[i].start_datetime)} ${DateToTimeString(insert_subtasks[i].start_datetime)}",\
-                                      "${DateToDateString(insert_subtasks[i].end_datetime)} ${DateToTimeString(insert_subtasks[i].end_datetime)}"
-                                      );`;
-    
-            db.run(queue_subtasks_sql, (queue_subtasks_err, queue_subtasks_rows) => {
-              if (queue_subtasks_err) throw queue_subtasks_err;
-            })
-          };
+          const patient_id = ${req.session.user.id};
+          const queue_tasks_sql = ` INSERT INTO Tasks (patient_id, start_datetime, end_datetime, is_completed, is_paid) VALUES\
+                                  (${patient_id},\
+                                  "${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}",\
+                                  "${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}",\
+                                  "No",\
+                                  "No"); `;
+          
+          db.run(queue_tasks_sql, function(queue_tasks_err) {
+            if (queue_tasks_err) throw queue_tasks_err;
+      
+            for (let i = 0; i < insert_subtasks.length; i++) {
+              const queue_subtasks_sql = ` INSERT INTO Subtasks (task_id, subtask_no, room_id, doctor_id, service_id, start_datetime, end_datetime) VALUES\
+                                        (${this.lastID},\
+                                        ${i+1},\
+                                        "${insert_subtasks[i].room_id}",\
+                                        ${req.body.doctor_id},\
+                                        "${insert_subtasks[i].service_id}",\
+                                        "${DateToDateString(insert_subtasks[i].start_datetime)} ${DateToTimeString(insert_subtasks[i].start_datetime)}",\
+                                        "${DateToDateString(insert_subtasks[i].end_datetime)} ${DateToTimeString(insert_subtasks[i].end_datetime)}"
+                                        );`;
+      
+              db.run(queue_subtasks_sql, (queue_subtasks_err, queue_subtasks_rows) => {
+                if (queue_subtasks_err) throw queue_subtasks_err;
+              })
+            };
 
-          return res.send(queueSuccess());
+            return res.send(queueSuccess());
+          });
         });
       });
     });
