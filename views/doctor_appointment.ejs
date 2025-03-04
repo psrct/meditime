@@ -1,0 +1,94 @@
+<%-include("head")%>
+<body>
+    <%-include("sidebar-doctor")%>
+    <%-include("main-content-top")%>
+    <input list="patients_data" id="patient_selected" type="text" placeholder="รหัส หรือ ชื่อผู้ป่วย..." onchange="patients_filter()">
+    <datalist id="patients_data"></datalist>
+
+    <input id="doctor_selected" type="text" placeholder="myself" disabled>
+
+    <input type="datetime-local" id="start_datetime_appointment" required>
+    <input type="datetime-local" id="end_datetime_appointment" disabled>
+    
+    <input list="rooms_data" id="room_selected" type="text" placeholder="รหัสห้อง..." onchange="rooms_filter()">
+    <datalist id="rooms_data"></datalist>
+    <br><br>
+    <button id="comfirm_button" onclick="comfirm()">Comfirm</button>
+    <button id="Cancel_button">Cancel</button>
+
+    <%-include("main-content-bottom")%>
+    <%-include("script-toggle-sidebar")%>
+
+
+    <!-- ---------------------------------------------------------- -->
+
+    <script>
+        <%-include('scripts/DateFormat')%>
+
+        const patients_datalist = document.getElementById("patients_data");
+        const rooms_datalist = document.getElementById("rooms_data");
+
+        const patients_data = <%- JSON.stringify(patients_data) %>;
+        const rooms_data = <%- JSON.stringify(rooms_data) %>;
+        console.log(patients_data);
+
+        function patients_filter() {
+            patients_datalist.innerHTML = "";
+            patients_data.forEach(function(item) {
+                let temOption = document.createElement("option");
+                temOption.dataset.id = item.id;
+                temOption.innerHTML = item.id;
+                temOption.value = item.name;
+                
+                patients_datalist.appendChild(temOption);
+            });
+        }
+        patients_filter();
+
+        function rooms_filter() {
+            rooms_datalist.innerHTML = "";
+            rooms_data.forEach(function(item) {
+                const temOption = document.createElement("option");
+                temOption.dataset.id = item.id;
+                temOption.innerHTML = item.name;
+                temOption.value = "ห้อง " + item.id;
+                
+                rooms_datalist.appendChild(temOption);
+            });
+        }
+        rooms_filter();
+        
+        function comfirm() {
+            const patient_selected = document.getElementById("patient_selected").value;
+            const patient_selectedOption = [...document.getElementById("patients_data").options]
+                .find(option => option.value === patient_selected);
+            
+            if (patient_selectedOption) {
+                const selectedId = patient_selectedOption.dataset.id;
+                console.log("รหัสผู้ป่วย: ", selectedId);
+            } else {
+                console.log("ไม่พบข้อมูลผู้ป่วย");
+            }
+
+            if (document.getElementById("start_datetime_appointment").value != "") {
+                const datetime_appointment = DMYToYMDTime(ISO8601ToYMDTime(new Date(document.getElementById("start_datetime_appointment").value)))
+
+                console.log("วันเวลานัดหมาย: ", datetime_appointment);
+            } else {
+                console.log("กรุณาเลือกวันเวลานัดหมาย");
+            }
+
+            const room_selected = document.getElementById("room_selected").value;
+            const room_selectedOption = [...document.getElementById("rooms_data").options]
+                .find(option => option.value === room_selected);
+            
+            if (room_selectedOption) {
+                const selectedId = room_selectedOption.dataset.id;
+                console.log("รหัสห้อง: ", selectedId);
+            } else {
+                console.log("ไม่พบข้อมูลรหัสห้อง");
+            }
+        };
+    </script>
+</body>
+</html>

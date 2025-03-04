@@ -20,12 +20,20 @@ exports.isOwner = (req, res, next)=>{
     if(req.session.user.usertype == "clinic_owner"){
         next()
     }else{
-        res.redirect('/home-staff');
+        res.redirect('/doctor_home');
     }
 }
 
-exports.isStaff = (req, res, next)=>{
+exports.isDoctor = (req, res, next)=>{
     if(req.session.user.usertype == "doctor"){
+        next()
+    }else{
+        res.redirect('/');
+    }
+}
+
+exports.isPatient = (req, res, next)=>{
+    if(req.session.user.usertype == "patient"){
         next()
     }else{
         res.redirect('/');
