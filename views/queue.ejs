@@ -72,7 +72,68 @@
         let radianList = [];
         let current_tasks_list = [];
 
+        let services_data_sorted = [];
 
+        let services_count = 0;
+
+        const services_container = document.getElementById("services_container");
+        const services_div_list = services_container.children;
+
+        const services_data = <%- JSON.stringify(services_data) %>;
+        const doctors_data = <%- JSON.stringify(doctors_data) %>;
+        const tasks_data = <%- JSON.stringify(tasks_data) %>;
+        const subtasks_data = <%- JSON.stringify(subtasks_data) %>;
+        const service_perms_data = <%- JSON.stringify(service_perms_data) %>;
+        const patient_data = <%- JSON.stringify(patient_data) %>;
+        
+        // services_data
+        services_data.forEach(service => {
+            const perms_list = service_perms_data.filter(perms => perms.service_id == service.service_id);
+
+            service.doctor_id = [];
+            service.specialty_id = [];
+            perms_list.forEach(perms => {
+                service.doctor_id.push(perms.doctor_id);
+                service.specialty_id.push(perms.specialty_id);
+            })
+            
+        });
+
+        function updateTasksAndServices() {
+            const doctor_selected = document.getElementById("doctor_selected").value;
+            const doctor_selectedOption = [...document.getElementById("doctors_data").options]
+                .find(option => option.value === doctor_selected);
+            
+            current_tasks_list = [];
+            services_data_sorted = [];
+
+            let selectedDoctorId;
+            let selectedSpecialtyId;
+
+            if (doctor_selectedOption) {
+                selectedDoctorId = doctor_selectedOption.dataset.id;
+                selectedSpecialtyId = doctor_selectedOption.dataset.specialty_id;
+            } else {
+                selectedDoctorId = -1;
+                selectedSpecialtyId = -1;
+            }
+
+            subtasks_data.forEach(item => {
+                if (item.doctor_id == selectedDoctorId || item.patient_id == patient_data) {
+                    current_tasks_list.push(item);
+                }
+            });
+            services_data.forEach(item => {
+                if (item.specialty_id == selectedSpecialtyId || item.doctor_id == selectedDoctorId) {
+                    services_data_sorted.push(item);
+                }
+            });
+            
+            Array.from(services_div_list).forEach(function(item) {
+                services_filter(item.id);
+            });
+        }
+        updateTasksAndServices();
 
         // Creating clock and number
         const canvasClockText = document.getElementById('clocktext');
@@ -175,31 +236,7 @@
         }
         updateClockData();
 
-        const services_container = document.getElementById("services_container");
-        const services_div_list = services_container.children;
-
-        const services_data = <%- JSON.stringify(services_data) %>;
-        const doctors_data = <%- JSON.stringify(doctors_data) %>;
-        const tasks_data = <%- JSON.stringify(tasks_data) %>;
-        const subtasks_data = <%- JSON.stringify(subtasks_data) %>;
-        const service_perms_data = <%- JSON.stringify(service_perms_data) %>;
         
-        // services_data
-        services_data.forEach(service => {
-            const perms_list = service_perms_data.filter(perms => perms.service_id == service.service_id);
-
-            service.doctor_id = [];
-            service.specialty_id = [];
-            perms_list.forEach(perms => {
-                service.doctor_id.push(perms.doctor_id);
-                service.specialty_id.push(perms.specialty_id);
-            })
-            
-        });
-
-        let services_data_sorted = [];
-
-        let services_count = 0;
 
         function services_filter(id) {
             if (!can_queue) return;
@@ -216,34 +253,6 @@
                 temOption.value = item.name;
                 
                 tem_services_datalist.appendChild(temOption);
-            });
-        }
-
-        function updateTasksAndServices() {
-            const doctor_selected = document.getElementById("doctor_selected").value;
-            const doctor_selectedOption = [...document.getElementById("doctors_data").options]
-                .find(option => option.value === doctor_selected);
-            
-            current_tasks_list = [];
-            services_data_sorted = [];
-
-            if (doctor_selectedOption) {
-                const selectedDoctorId = doctor_selectedOption.dataset.id;
-                const selectedSpecialtyId = doctor_selectedOption.dataset.specialty_id;
-                subtasks_data.forEach(item => {
-                    if (item.doctor_id == selectedDoctorId) {
-                        current_tasks_list.push(item);
-                    }
-                });
-                services_data.forEach(item => {
-                    if (item.specialty_id == selectedSpecialtyId || item.doctor_id == selectedDoctorId) {
-                        services_data_sorted.push(item);
-                    }
-                });
-            }
-            
-            Array.from(services_div_list).forEach(function(item) {
-                services_filter(item.id);
             });
         }
 
@@ -271,7 +280,7 @@
                                 <datalist id="services_data"></datalist>\
                                 <a>ระยะเวลาบริการ : </a><input class="duration_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>\
                                 <a>ราคาบริการ : </a><input class="price_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>` +
-                                (services_count != 1 ? `<button class="btn btn-danger" onclick="removeService(${services_count});updateDuration();updateAllPrice();updateClockData();">-</button>` : ``);
+                                (services_count != 1 ? `<button onclick="removeService(${services_count});updateDuration();updateAllPrice();updateClockData();">-</button>` : ``);
             temDiv.id = services_count;
 
             services_container.appendChild(temDiv);
@@ -366,7 +375,10 @@
             if (isNaN(destTime.getTime())) return; 
 
             Array.from(services_div_list).forEach(function(item) {
-                if (item.querySelector(".duration_input").placeholder.split(" ")[1] === "นาที") {
+                if (item.querySelector(".duration_input").placeholder.split(" ")[1] === "ชั่วโมง") {
+                    destTime.setMinutes(destTime.getMinutes() + 60*parseInt(item.querySelector(".duration_input").placeholder.split(" ")[0])
+                                        + parseInt(item.querySelector(".duration_input").placeholder.split(" ")[2]));
+                } else if (item.querySelector(".duration_input").placeholder.split(" ")[1] === "นาที") {
                     destTime.setMinutes(destTime.getMinutes() + parseInt(item.querySelector(".duration_input").placeholder.split(" ")[0]));
                 } else {
                     document.getElementById("end_time_input").value = "";
