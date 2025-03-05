@@ -142,11 +142,11 @@ app.get('/logout', function(req, res){
 
 // --------------------------------  FOR PATIENT --------------------------------------------------------
 
-app.get('/', checkLoggedIn, isPatient, function (req, res) {
+app.get('/', function (req, res) {
   res.redirect('/home');
 });
 
-app.get('/home', checkLoggedIn, isPatient, function (req, res) {
+app.get('/home', function (req, res) {
   const sql = ' SELECT s.status AS `status`, s.name AS `service_name`, c.name AS `category_name`, s.duration AS `duration`, s.price AS `price` FROM Services s\
                JOIN Service_categories c USING (category_id)\
                ORDER BY s.service_id ASC';
