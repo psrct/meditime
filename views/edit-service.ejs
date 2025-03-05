@@ -1,4 +1,6 @@
 <%-include("head")%>
+<%-include("sidebar-doctor")%>
+<%-include("main-content-top")%>
 
     <style>
         input, select {
@@ -10,35 +12,66 @@
         .txtbox {
             color: rgb(53, 72, 126);
         }
+        .form{
+            width: 400px;
+            height: 650px;
+            font-size: 18px;
+            border: solid 2px black;
+            border-radius: 2%;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.94);
+        }
     </style>
 
-    <body>
-
         <body>
-            <h2>Edit Service</h2>
-            <form action="/edit-service" method="post">
-                ServiceID : <input type="text" id="id" class="txtbox" value="<%= data.service_id%>" readonly placeholder="id"
+            <h1>แก้ไขบริการ</h1>
+            <div class="d-flex form align-items-center justify-content-center"> 
+                <form action="/edit-service" method="post">
+                    <label for="serviceID">รหัส</label><br>
+                    <input type="text" id="id" class="txtbox" value="<%= data.service_id%>" readonly placeholder="id"
                     name="id"><br>
-                Name : <input type="text" id="name" class="txtbox" value="<%= data.name%>" readonly placeholder="name"
-                    name="serviceName"><br>
-                Category : <input type="text" id="category" class="txtbox" value="<%= data.category_id%>"
-                    readonly placeholder="category" name="serviceCategory"><br>
-                Price : <input type="text" id="price" class="txtbox" value="<%= data.price%>" readonly placeholder="price"
-                    name="price"><br>
-                Duration : <input type="text" id="duration" class="txtbox" value="<%= data.duration%>"
-                    readonly placeholder="duration" name="serviceDuration"><br>
-                Status : <select name="serviceStatus" id="service_status" readonly>
-                    <option value="<%= data.status%>">
-                        <%=data.status%>
-                    </option>
-                    <option value="Inactive">🔴 Inactive</option>
-                    <option value="Active">🟢 Active</option>
-                </select><br>
-                <input onclick="toggleEdit()" type="button" value="Edit" class="btn border">
-                <button class="btn border" type="submit">Save</button>
-                <a class="btn border" href="/showservices">Cancel</a>
-            </form>
-        </body>
+                    <label for="serviceName">ชื่อบริการ</label><br>
+                    <input type="text" id="name" class="txtbox" value="<%= data.name%>" readonly placeholder="name"
+                        name="serviceName"><br>
+                        <label for="serviceCategory">หมวดหมู่</label><br>
+                        <input type="text" id="category" class="txtbox" value="<%= data.category_id%>"
+                        readonly placeholder="category" name="serviceCategory"><br>
+                        <label for="Price">ราคา</label><br>
+                        <input type="text" id="price" class="txtbox" value="<%= data.price%>" readonly placeholder="price"
+                        name="price"><br>
+                        <label for="serviceDuration">จำนวน</label><br>
+                        <input type="text" id="duration" class="txtbox" value="<%= data.duration%>"
+                        readonly placeholder="duration" name="serviceDuration"><br>
+                        <label for="serviceStatus">สถานะ</label><br>
+                        <select name="serviceonlydoctor" id="serviceonlydoctor" class="rounded">
+                            <option value="<%= data.only_doctor%>">
+                                <% if (data.only_doctor=== 'Yes'){ %>
+                                    🟢 ใช่
+                                <% } else { %>
+                                    🔴 ไม่ใช่
+                                <% } %>
+                            </option>
+                            <option value="No">🔴 ไม่ใช่</option>
+                            <option value="Yes">🟢 ใช่</option>
+                        </select><br>
+                        <select name="serviceStatus" id="service_status" readonly>
+                        <option value="<%= data.status%>">
+                            <% if (data.status=== 'Active'){ %>
+                                🟢 กำลังทำงาน
+                            <% } else { %>
+                                🔴 ไม่ทำงาน
+                            <% } %>
+                        </option>
+                        <option value="Inactive">🔴 ไม่ทำงาน</option>
+                        <option value="Active">🟢 กำลังทำงาน</option>
+                    </select><br>
+                    <input onclick="toggleEdit()" type="button" value="แก้ไข" class="btn border text-white bg-primary">
+                    <button class="btn border text-white bg-primary" type="submit">บันทึก</button>
+                    <a class="btn border text-white bg-danger" href="/showservices">ยกเลิก</a>
+                </form>   
+            </div>
+        
         <%-include("script-toggle-edit")%>
-
-            </html>
+        <%-include("main-content-bottom")%>
+        <%-include("script-toggle-sidebar")%>
+    </body>
+</html>

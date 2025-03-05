@@ -1,0 +1,46 @@
+<%-include("head")%>
+<%-include("sidebar-doctor")%>
+<%-include("main-content-top")%>
+<style>
+    .form{
+        width: 400px;
+        height: 650px;
+        font-size: 18px;
+        border: solid 2px black;
+        border-radius: 2%;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.94);
+    }
+</style>
+    <body>
+        <!-- ฟอร์มเพิ่ม Service -->
+        <h1>เพิ่มบริการ</h1>
+        <div id="serviceForm" class="d-flex form align-items-center justify-content-center">
+            <form action="/add-service" method="POST">
+                <label for="serviceID">รหัส</label><br>
+                <input type="text" id="service_id" name="serviceID" required class="rounded" placeholder="รหัส"><br>
+                <label for="serviceName">ชื่อบริการ</label><br>
+                <input type="text" id="name" name="serviceName" required class="rounded" placeholder="ชื่อบริการ"><br>
+                <label for="serviceCategory">หมวดหมู่</label><br>
+                <input type="text" id="category_id" name="serviceCategory" required class="rounded" placeholder="หมวดหมู่"><br>
+                <label for="Price">ราคา</label><br>
+                <input type="text" id="price" name="price" required class="rounded" placeholder="ราคา"><br>
+                <label for="serviceDuration">จำนวน</label><br>
+                <input type="text" id="service_name" name="serviceDuration" required class="rounded" placeholder="จำนวน"><br>
+                <label for="serviceonlydoctor">เฉพาะหมอ</label><br>
+                <select name="serviceonlydoctor" id="serviceonlydoctor" class="rounded">
+                    <option value="No">🔴 ไม่ใช่</option>
+                    <option value="Yes">🟢 ใช่</option>
+                </select><br>
+                <label for="serviceStatus">สถานะ</label><br>
+                <select name="serviceStatus" id="service_status" class="rounded">
+                    <option value="Inactive">🔴 ไม่ทำงาน</option>
+                    <option value="Active">🟢 กำลังทำงาน</option>
+                </select><br>
+                <button class="btn border text-white bg-primary my-2" type="submit">ยืนยัน</button>
+                <a class="btn border text-white bg-danger" href="/showservices">ยกเลิก</a>
+            </form>
+        </div>
+        <%-include("main-content-bottom")%>
+        <%-include("script-toggle-sidebar")%>
+    </body>
+</html>
