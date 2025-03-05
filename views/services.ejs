@@ -1,121 +1,128 @@
 <%-include("head")%>
-<script>
-    function showForm() {
-        document.getElementById('serviceForm').style.display = 'block';
-    }
+<%-include("sidebar-doctor")%>
+<%-include("main-content-top")%>
 
-    function hideForm() {
-        document.getElementById('serviceForm').style.display = 'none';
-    }
-</script>
-<style>
-    #serviceForm {
-        display: none;
-        margin-top: 20px;
-    }
-    .circle {
-        margin-right: 10px;
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        animation: flashColor 2s infinite;
-      }@keyframes flashColor{
-        0%,100%{
-            background-color: red;
+        <script>
+            function deleteService(id) {
+                Swal.fire({
+                    title: "คุณแน่ใจหรือไม่?",
+                    text: "เมื่อลบแล้วจะไม่สามารถกู้คืนได้!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "ใช่, ลบเลย!",
+                    cancelButtonText: "ยกเลิก"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/deleteservice/${id}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("ลบสำเร็จ!", data.message, "success")
+                                        .then(() => location.reload()); // รีโหลดหน้า
+                                } else {
+                                    Swal.fire("เกิดข้อผิดพลาด!", data.message, "error");
+                                }
+                            });
+                    }
+                });
+            }
+        </script>
+        <style>
+        .circle {
+            margin-right: 10px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            animation: flashColor 2s infinite;
         }
-        50%{
-            background-color: rgb(254, 194, 194);
+
+        @keyframes flashColor {
+
+            0%,
+            100% {
+                background-color: red;
+            }
+
+            50% {
+                background-color: rgb(254, 194, 194);
+            }
         }
-      }
-    .circle2 {
-        margin-right: 10px;
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        animation: flashColor2 2s infinite;
-      }@keyframes flashColor2{
-        0%,100%{
-            background-color: rgb(0, 255, 0);
+
+        .circle2 {
+            margin-right: 10px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            animation: flashColor2 2s infinite;
         }
-        50%{
-            background-color: rgb(197, 255, 197);
+
+        @keyframes flashColor2 {
+
+            0%,
+            100% {
+                background-color: rgb(0, 255, 0);
+            }
+
+            50% {
+                background-color: rgb(197, 255, 197);
+            }
         }
-      }
-    .flex{
-        display: flex;
-        align-items: center;
-    }
-</style>
-<body>
-    <h1>Services</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Service</th>
-                <th>Service Category</th>
-                <th>Price</th>
-                <th>Duration</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
+
+        .flex {
+            display: flex;
+            align-items: center;
+        }
+        .grid{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        @media (max-width: 1200px){
+            .grid{
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 900px){
+            .grid{
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px){
+            .grid{
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <body>
+        <div class="grid mx-5">
             <% data.forEach((item)=> { %>
-                <tr>
-                    <td>
-                        <%= item.service_id%>
-                    </td>
-                    <td>
-                        <%= item.name%>
-                    </td>
-                    <td>
-                        <%= item.category_name%>
-                    </td>
-                    <td>
-                        <%= item.price%>
-                    </td>
-                    <td>
-                        <%= item.duration%>
-                    </td>
-                    <td class="flex">
-                        <% if (item.status === 'Active') { %>
-                            <div class="circle2"></div> Active
+                <div class="grid-item border p-3">
+                    <p>รหัส : <%= item.service_id%></p>
+                    <p>ชื่อบริการ : <%= item.name%></p>
+                    <p>หมวดหมู่ : <%= item.category_name%></p>
+                    <p>ราคา : <%= item.price%></p>
+                    <p>จำนวน : <%= item.duration%></p>
+                    <div class="flex">
+                        <% if (item.status==='Active' ) { %>
+                            <div class="circle2"></div> กำลังทำงาน
                         <% } else { %>
-                            <div class="circle"></div> Inactive
+                            <div class="circle"></div> ไม่ทำงาน
                         <% } %>
-                    </td>
-                </tr>
-                <% }) %>
-        </tbody>
-    </table>
-
-    <h2>Manage Services</h2>
-    <!-- ปุ่ม Add -->
-    <button onclick="showForm()" class="btn border">Add Service</button>
-    <a href="/showservices/T01" class="btn border">Edit</a>
-    <a href="/deleteservice/T05" class="btn border">Delete</a>
-    
-
-    <!-- ฟอร์มเพิ่ม Service -->
-    <div id="serviceForm">
-        <form action="/add-service" method="POST">
-            <label for="serviceID">ID:</label>
-            <input type="text" id="service_id" name="serviceID" required><br>
-            <label for="serviceName">Service Name:</label>
-            <input type="text" id="name" name="serviceName" required><br>
-            <label for="serviceCategory">Service Category:</label>
-            <input type="text" id="category_id" name="serviceCategory" required><br>
-            <label for="Price">Price:</label>
-            <input type="text" id="price" name="price" required><br>
-            <label for="serviceDuration">Duration:</label>
-            <input type="text" id="service_name" name="serviceDuration" required><br>
-            <label for="serviceStatus">Status:</label>
-            <select name="serviceStatus" id="service_status">
-                <option value="Inactive">🔴 Inactive</option>
-                <option value="Active">🟢 Active</option>
-            </select><br>
-            <button type="submit">Confirm</button>
-            <button type="button" onclick="hideForm()">Cancel</button>
-        </form>
-    </div>
-</body>
+                    </div>
+                    <div class="icon py-2">
+                        <a href="/showservices/<%= item.service_id%>" class="btn border"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="m18.988 2.012 3 3L19.701 7.3l-3-3zM8 16h3l7.287-7.287-3-3L8 13z"></path><path d="M19 19H8.158c-.026 0-.053.01-.079.01-.033 0-.066-.009-.1-.01H5V5h6.847l2-2H5c-1.103 0-2 .896-2 2v14c0 1.104.897 2 2 2h14a2 2 0 0 0 2-2v-8.668l-2 2V19z"></path></svg></a>
+                        <button onclick="deleteService('<%= item.service_id%>')" class="btn border"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M8.586 18 12 21.414 15.414 18H19c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2H5c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h3.586zM5 4h14v12h-4.414L12 18.586 9.414 16H5V4z"></path><path d="M9.707 13.707 12 11.414l2.293 2.293 1.414-1.414L13.414 10l2.293-2.293-1.414-1.414L12 8.586 9.707 6.293 8.293 7.707 10.586 10l-2.293 2.293z"></path></svg></button>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+        <div class="d-flex flex-row justify-content-end fixed-bottom mx-3 my-3">
+            <a href="/add" class="btn border"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M16 2H8C4.691 2 2 4.691 2 8v13a1 1 0 0 0 1 1h13c3.309 0 6-2.691 6-6V8c0-3.309-2.691-6-6-6zm4 14c0 2.206-1.794 4-4 4H4V8c0-2.206 1.794-4 4-4h8c2.206 0 4 1.794 4 4v8z"></path><path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4z"></path></svg></a>
+        </div>
+        <%-include("main-content-bottom")%>
+        <%-include("script-toggle-sidebar")%>
+    </body>
+</html>

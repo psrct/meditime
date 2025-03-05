@@ -313,7 +313,7 @@ app.get('/remove-staff/:id', checkLoggedIn, isOwner, function(req, res){
 app.get('/showservices', checkLoggedIn, isOwner, function (req, res) {
   const sql = `
     SELECT s.*, sc.name AS category_name
-    FROM Service s
+    FROM Services s
     JOIN Service_categories sc
     ON s.category_id = sc.category_id
   `;
@@ -327,6 +327,10 @@ app.get('/showservices', checkLoggedIn, isOwner, function (req, res) {
   });
 });
 
+app.get("/add" ,checkLoggedIn, isOwner, function (req, res){
+  res.render('addform')
+});
+
   // เพิ่มบริการใหม่
 app.post('/add-service',checkLoggedIn, isOwner, function (req, res) {
     console.log('Received Data:', req.body);
@@ -336,11 +340,12 @@ app.post('/add-service',checkLoggedIn, isOwner, function (req, res) {
         serviceCategory: req.body.serviceCategory,
         price: req.body.price,
         serviceDuration: req.body.serviceDuration,
+        serviceonlydoctor: req.body.serviceonlydoctor,
         serviceStatus: req.body.serviceStatus
     };
 
-    const sql = `INSERT INTO Service (service_id, name, category_id, price, duration, status) 
-                    VALUES (?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO Services (service_id, name, category_id, price, duration, only_doctor, status) 
+                    VALUES (?, ?, ?, ?, ?,?, ?)`;
 
     db.run(sql, [
         addData.serviceID,
@@ -348,6 +353,7 @@ app.post('/add-service',checkLoggedIn, isOwner, function (req, res) {
         addData.serviceCategory,
         addData.price,
         addData.serviceDuration,
+        addData.serviceonlydoctor,
         addData.serviceStatus
     ], (err) => {
         if (err) {
@@ -362,9 +368,9 @@ app.post('/add-service',checkLoggedIn, isOwner, function (req, res) {
 app.get('/showservices/:id',checkLoggedIn, isOwner, function(req, res){
     const userId = req.params.id;
     console.log(userId);
-    db.get('SELECT * FROM Service WHERE service_id = ?', [userId], (err, row) => {
+    db.get('SELECT * FROM Services WHERE service_id = ?', [userId], (err, row) => {
     if (err || !row) {
-        return res.status(404).send('User not found.');
+        return res.status(404).send('Error fetch data');
     }
     res.render('edit-service', { data: row });
     });
@@ -379,16 +385,18 @@ app.post('/edit-service',checkLoggedIn, isOwner, function (req, res) {
         serviceCategory: req.body.serviceCategory,
         price: req.body.price,
         serviceDuration: req.body.serviceDuration,
+        serviceonlydoctor: req.body.serviceonlydoctor,
         serviceStatus: req.body.serviceStatus
     };
     console.log(updateData);
-    const sql = `UPDATE Service SET name = ?, category_id = ?, price = ?, duration = ?, status = ? WHERE service_id = ?`;
+    const sql = `UPDATE Services SET name = ?, category_id = ?, price = ?, duration = ?, only_doctor = ?, status = ? WHERE service_id = ?`;
     db.run(sql, [
         updateData.serviceName,
         updateData.serviceCategory,
         updateData.price,
         updateData.serviceDuration,
         updateData.serviceStatus,
+        updateData.serviceonlydoctor,
         updateData.serviceID
     ], (err) => {
         if (err) {
@@ -400,17 +408,16 @@ app.post('/edit-service',checkLoggedIn, isOwner, function (req, res) {
 });
 
 //ลบบริการ
-app.get('/deleteservice/:id',checkLoggedIn, isOwner, (req, res) => {
-// req.params.id --> processes --> respond  res.*
-    let id = req.params.id;
-    const query = `DELETE FROM Service WHERE service_id='${id}'; `;
-    db.run(query, function (err) {
-        if (err) {
-            return console.error(err.message);
-        }
-        console.log(`A Service deleted.`);
-        res.redirect('/showservices');
-    });
+app.get('/deleteservice/:id', checkLoggedIn, isOwner, (req, res) => {
+  let id = req.params.id;
+  const query = `DELETE FROM Services WHERE service_id='${id}'; `;
+  db.run(query, function (err) {  
+      if (err) {
+          return res.json({ success: false, message: "เกิดข้อผิดพลาดในการลบ" });
+      }
+      console.log(`A Service deleted.`);
+      res.json({ success: true, message: "ลบรายการสำเร็จ!" });
+  });
 });
 
 // -------------------------------------- FOR STAFF  -------------------------------------------------------
