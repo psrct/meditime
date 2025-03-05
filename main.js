@@ -25,6 +25,11 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
+  if(!req.session.user){
+    req.session.user = {
+      isLoggedin : false
+    };
+  }
   res.locals.user = req.session.user;
   next();
 })
@@ -53,8 +58,10 @@ app.post('/login', function(req, res){
       req.session.user = {
         id: rows[0].patient_id,
         username: rows[0].username,
-        usertype: "patient"
+        usertype: "patient",
+        isLoggedin: true
       }
+      
       res.redirect("/");
     }
   });
@@ -82,7 +89,8 @@ app.post('/login-staff', function(req, res){
         id: rows[0].doctor_id,
         username: rows[0].username,
         specialty: rows[0].specialty_id,
-        usertype: "clinic_owner"
+        usertype: "clinic_owner",
+        isLoggedin: true
       }
       res.redirect("/showservices");
     }
@@ -91,7 +99,8 @@ app.post('/login-staff', function(req, res){
         id: rows[0].doctor_id,
         username: rows[0].username,
         specialty: rows[0].specialty_id,
-        usertype: "doctor"
+        usertype: "doctor",
+        isLoggedin: true
       }
       res.redirect("/doctor_home");
     }
@@ -135,8 +144,10 @@ app.post('/register', bypasslogin, function(req, res){
 });
 
 app.get('/logout', function(req, res){
-  req.session.destroy();
   res.clearCookie('user');
+  req.session.user = {
+    isLoggedin : false
+  };
   res.redirect('/');
 })
 
@@ -144,6 +155,7 @@ app.get('/logout', function(req, res){
 // --------------------------------  FOR PATIENT --------------------------------------------------------
 
 app.get('/', function (req, res) {
+  console.log(req.session.user);
   res.redirect('/home');
 });
 

@@ -13,7 +13,8 @@
     }
 </style>
 <body>
-
+    <%-include("sidebar")%>
+    <%-include("main-content-top")%>
     <form action="/profile" method="post">
         <input id="username" class="txtbox" name="username" value="<%=data[0].username%>" readonly><br> <br>
         <select id="prename" class="option" name="prename" disabled>;
@@ -38,7 +39,9 @@
         <input onclick="toggleEdit()" type="button" value="Edit">
         <input type="submit" value="Save">
     </form>
-
+    
+    <%-include("main-content-bottom")%>
+    <%-include("script-toggle-sidebar")%>
     <%-include("script-toggle-edit")%>
     <script>
         var prename = "<%=data[0].prename%>";
@@ -60,7 +63,7 @@
             document.getElementById("female").setAttribute("selected", true);
         }
     </script>
-
+    
 </body>
 </html>
 

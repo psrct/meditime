@@ -1,5 +1,5 @@
 exports.checkLoggedIn = (req, res, next) =>{
-    if(req.session.user){
+    if(req.session.user.isLoggedin){
         next();
     }else{
         // console.log(!req.session.user);
@@ -9,7 +9,7 @@ exports.checkLoggedIn = (req, res, next) =>{
 }
 
 exports.bypasslogin = (req, res, next)=>{
-    if(!req.session.user){
+    if(!req.session.user.isLoggedin){
         next()
     }else{
         res.redirect('/');

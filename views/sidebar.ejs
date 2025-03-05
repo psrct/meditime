@@ -20,16 +20,22 @@
                     <span>Services</span>
                 </a>
             </li>
-            <li class="sidebar-item">
+            <li id="schedule" class="sidebar-item">
                 <a href="#" class="sidebar-link">
                     <i class="lni lni-calendar-days"></i>
                     <span>Schedule</span>
                 </a>
             </li>
-            <li class="sidebar-item">
+            <li id="history" class="sidebar-item">
                 <a href="#" class="sidebar-link">
                     <i class="lni lni-hourglass"></i>
                     <span>History</span>
+                </a>
+            </li>
+            <li id="profile" class="sidebar-item">
+                <a href="/profile" class="sidebar-link">
+                    <i class="lni lni-user-4"></i>
+                    <span>Profile</span>
                 </a>
             </li>
             <li id="logout" class="sidebar-item">
@@ -40,19 +46,27 @@
             </li>
             <li id="login" class="sidebar-item" hidden>
                 <a href="/login" class="sidebar-link">
-                    <i class="lni lni-exit"></i>
+                    <i class="lni lni-enter"></i>
                     <span>Login</span>
                 </a>
             </li>
          </ul>
     </aside>
     <script>
-        // var user;
-        // console.log(user);
-        // if(user != ""){
-        //     document.getElementById("logout").removeAttribute("hidden");
-        //     document.getElementById("login").setAttribute("hidden", true);
-        // }
+        var isLoggedin = <%= user.isLoggedin %>;
+        if(isLoggedin){
+            document.getElementById("schedule").removeAttribute("hidden");
+            document.getElementById("history").removeAttribute("hidden");
+            document.getElementById("logout").removeAttribute("hidden");
+            document.getElementById("profile").removeAttribute("hidden");
+            document.getElementById("login").setAttribute("hidden", true);
+        }else{
+            document.getElementById("schedule").setAttribute("hidden", true);
+            document.getElementById("history").setAttribute("hidden", true);
+            document.getElementById("logout").setAttribute("hidden", true);
+            document.getElementById("profile").setAttribute("hidden", true);
+            document.getElementById("login").removeAttribute("hidden");
+        }
     </script>
 
    

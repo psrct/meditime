@@ -1,27 +1,61 @@
 <%-include("head")%>
 
 <body>
-    <form action="/add-staff" method="post">
-        <input type="text" name="username" placeholder="Username"><br>
-        <input type="password" name="password" placeholder="Password"><br>
-        <select id="prename" name="prename">
-            <option value="นายแพทย์">นายแพทย์</option>
-            <option value="แพทย์หญิง">แพทย์หญิง</option>
-        </select>
-        <input type="text" name="firstname" placeholder="Enter your FirstName">
-        <input type="text" name="lastname" placeholder="Enter your LastName"><br>
-        <select id="gender" name="gender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-        </select>
-        <select id="specialty" name="specialty">
-            <% data.forEach((item) => { %>
-                <option value="<%= item.specialty_id %>">
-                    <%= item.name %>
-                </option>
-            <% }); %>
-        </select>
-        <input type="submit" value="Add Doctor">
-    </form>
+    <%-include("sidebar-owner")%>
+    <%-include("main-content-top")%>
+    <div class="container">
+        <h1>Add Doctor</h1>
+        <form action="/add-staff" method="post">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <Label from="username">Username</Label>
+                    <input class="form-control" id="username" type="text" name="username" placeholder="Username"><br>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="password">Password</label>
+                    <input class="form-control" type="text" name="password" placeholder="Password"><br>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="prename">คำนำหน้า</label>
+                    <select class="form-control" id="prename" name="prename">
+                        <option value="นายแพทย์">นายแพทย์</option>
+                        <option value="แพทย์หญิง">แพทย์หญิง</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="f_name">ชื่อจริง</label>
+                    <input class="form-control" id="f_name" type="text" name="firstname" placeholder="Enter your FirstName">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="l_name">นามสกุล</label>
+                    <input class="form-control" id="l_name" type="text" name="lastname" placeholder="Enter your LastName"><br>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="gender">เพศ</label>
+                    <select class="form-control" id="gender" name="gender">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-5">
+                    <label for="specialty">Specialty</label>
+                    <select class="form-control" id="specialty" name="specialty">
+                        <% data.forEach((item) => { %>
+                            <option value="<%= item.specialty_id %>">
+                                <%= item.name %>
+                            </option>
+                        <% }); %>
+                    </select>
+                    <br>
+                    <input class="btn btn-success" type="submit" value="Add Doctor">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <%-include("main-content-bottom")%>
+    <%-include("script-toggle-sidebar")%>
 </body>
 </html>

@@ -1,12 +1,17 @@
 <%-include("head")%>
 
 <body>
+    <%-include("sidebar")%>
+    <%-include("main-content-top")%>
     <h1>Login</h1>
     <form action="/login" method="post">
         <input type="text" name="username" placeholder="Username">
         <input type="password" name="password" placeholder="Password">
         <input type="submit" value="Login">
     </form>
-    <a href="/login-staff">Login as staff.</a>
+    <a href="/login-staff">Login as staff.</a><br>
+    <a href="/register">register as patient</a>
+    <%-include("main-content-bottom")%>
+    <%-include("script-toggle-sidebar")%>
 </body>
 </html>
