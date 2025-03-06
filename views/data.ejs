@@ -1,15 +1,14 @@
 <%- include("head") %>
 
   <body>
+    <%-include("sidebar")%>
+    <%-include("main-content-top")%>
     <h1>Table Of Task</h1>
     <table>
       <thead>
         <tr>
-          <th>ID</th>
-          <th>RoomID</th>
-          <th>ServiceID</th>
+          <th>TaskID</th>
           <th>PatientID</th>
-          <th>DoctorID</th>
           <th>Start</th>
           <th>End</th>
           <th>Completed?</th>
@@ -23,16 +22,7 @@
               <%= item.task_id %>
             </td>
             <td>
-              <%= item.room_id %>
-            </td>
-            <td>
-              <%= item.service_id %>
-            </td>
-            <td>
               <%= item.patient_id %>
-            </td>
-            <td>
-              <%= item.doctor_id %>
             </td>
             <td>
               <%= item.start_datetime %>
@@ -47,6 +37,8 @@
           <% }) %>
       </tbody>
     </table>
+    <%-include("main-content-bottom")%>
+    <%-include("script-toggle-sidebar")%>
   </body>
 
   </html>

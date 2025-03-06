@@ -1,6 +1,8 @@
 <%- include("head") %>
 
     <body>
+        <%-include("sidebar-doctor")%>
+        <%-include("main-content-top")%>
         <h1>Table Of Subtasks</h1>
         <table>
             <thead>
@@ -43,6 +45,8 @@
                     <% }) %>
             </tbody>
         </table>
+        <%-include("main-content-bottom")%>
+        <%-include("script-toggle-sidebar")%>
     </body>
 
     </html>

@@ -10,7 +10,6 @@ const { checkLoggedIn, bypasslogin, isOwner, isDoctor, isPatient } = require('./
 const { json } = require('stream/consumers');
 
 app.use(express.json());
-app.use(express.static('webpages'));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
@@ -79,7 +78,7 @@ app.post('/login-staff', function(req, res){
   }
   const sql = `select * from Doctors where username = "${loginData.username}" `;
   db.all(sql, function(err, rows){
-    console.log(rows);
+    // console.log(rows);
     if(rows.length < 1){
       res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login-staff';</script> ")
     }else if(loginData.password != rows[0].password){
@@ -208,6 +207,16 @@ app.post('/profile', checkLoggedIn, isPatient, function(req, res){
     });
 })
 
+app.get('/history',checkLoggedIn, isPatient, function (req, res) {
+  const query = 'SELECT * FROM Tasks;';
+  db.all(query, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('data', { data: rows });
+  });
+});
 
 // -------------------------------------- FOR CLINIC OWNER -------------------------------------------------------
 
@@ -225,13 +234,10 @@ app.get('/edit-staff/:id', checkLoggedIn, isOwner, function(req, res){
   const sql = `select * from Doctors where doctor_id = ${req.params.id} `;
   db.all(sql, function(err, rows){
     console.log(rows);
-    db.all("select * from Specialties", (err, result) =>{
-      if(err) throw err;
-      var str = `{ "docinfo" : ` + JSON.stringify(rows) + `, "specialtyinfo" : ` + JSON.stringify(result) + `}`;
-      console.log(typeof(str));
-      console.log(JSON.parse(str));
-      res.render('profile-staff', {data : JSON.parse(str)});
-    })
+    db.all("select * from Specialties", function(err, result){
+      console.log(result);
+      res.render('profile-staff', {data : rows, specialtyinfo : result});
+      })
     });
 })
 
@@ -433,7 +439,18 @@ app.get('/deleteservice/:id', checkLoggedIn, isOwner, (req, res) => {
   });
 });
 
-// -------------------------------------- FOR STAFF  -------------------------------------------------------
+app.get('/records',checkLoggedIn, isOwner, function (req, res) {
+  const query = 'SELECT * FROM Subtasks;';
+  db.all(query, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('datasubtask', { data: rows });
+  });
+});
+
+// -------------------------------------- FOR DOCTOR  -------------------------------------------------------
 
   
 // app.get('/home-staff', checkLoggedIn, isStaff, function(req, res){
@@ -462,6 +479,18 @@ app.get('/doctor_home', checkLoggedIn, isDoctor, function (req, res) {
         res.render('doctor_home', { tasks_data: tasks_rows });
     });
 });
+
+app.get('/doctor_history', checkLoggedIn, isDoctor, function (req, res) {
+  const query = 'SELECT * FROM Subtasks;';
+  db.all(query, (err, rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log(rows);
+    res.render('datasubtask', { data: rows });
+  });
+});
+
 
 //---------------------------------------- QUEQE SYSTEMS --------------------------------------------------------------
 
