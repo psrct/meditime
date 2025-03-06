@@ -1,75 +1,106 @@
 <%-include("head")%>
-<%-include("sidebar-doctor")%>
+<%-include("sidebar-owner")%>
 <%-include("main-content-top")%>
 
-    <style>
-        input, select {
-            font-size: 18px;
-            margin-bottom: 5px;
-            margin-top: 5px;
-        }
-
-        .txtbox {
-            color: rgb(53, 72, 126);
-        }
-        .form{
-            width: 400px;
-            height: 650px;
-            font-size: 18px;
-            border: solid 2px black;
-            border-radius: 2%;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.94);
-        }
-    </style>
-
         <body>
-            <h1>แก้ไขบริการ</h1>
-            <div class="d-flex form align-items-center justify-content-center"> 
-                <form action="/edit-service" method="post">
-                    <label for="serviceID">รหัส</label><br>
-                    <input type="text" id="id" class="txtbox" value="<%= data.service_id%>" readonly placeholder="id"
-                    name="id"><br>
-                    <label for="serviceName">ชื่อบริการ</label><br>
-                    <input type="text" id="name" class="txtbox" value="<%= data.name%>" readonly placeholder="name"
-                        name="serviceName"><br>
-                        <label for="serviceCategory">หมวดหมู่</label><br>
-                        <input type="text" id="category" class="txtbox" value="<%= data.category_id%>"
-                        readonly placeholder="category" name="serviceCategory"><br>
-                        <label for="Price">ราคา</label><br>
-                        <input type="text" id="price" class="txtbox" value="<%= data.price%>" readonly placeholder="price"
-                        name="price"><br>
-                        <label for="serviceDuration">จำนวน</label><br>
-                        <input type="text" id="duration" class="txtbox" value="<%= data.duration%>"
-                        readonly placeholder="duration" name="serviceDuration"><br>
-                        <label for="serviceStatus">สถานะ</label><br>
-                        <select name="serviceonlydoctor" id="serviceonlydoctor" class="rounded">
-                            <option value="<%= data.only_doctor%>">
-                                <% if (data.only_doctor=== 'Yes'){ %>
-                                    🟢 ใช่
-                                <% } else { %>
-                                    🔴 ไม่ใช่
-                                <% } %>
-                            </option>
-                            <option value="No">🔴 ไม่ใช่</option>
-                            <option value="Yes">🟢 ใช่</option>
-                        </select><br>
-                        <select name="serviceStatus" id="service_status" readonly>
-                        <option value="<%= data.status%>">
-                            <% if (data.status=== 'Active'){ %>
-                                🟢 กำลังทำงาน
-                            <% } else { %>
-                                🔴 ไม่ทำงาน
-                            <% } %>
-                        </option>
-                        <option value="Inactive">🔴 ไม่ทำงาน</option>
-                        <option value="Active">🟢 กำลังทำงาน</option>
-                    </select><br>
-                    <input onclick="toggleEdit()" type="button" value="แก้ไข" class="btn border text-white bg-primary">
-                    <button class="btn border text-white bg-primary" type="submit">บันทึก</button>
-                    <a class="btn border text-white bg-danger" href="/showservices">ยกเลิก</a>
-                </form>   
+            <!-- ฟอร์มเพิ่ม Service -->
+        <main class="p-3">
+            <div class="container-fluid">
+                <div class="container">
+                    <h1>แก้ไขบริการ</h1>
+                    <form action="/edit-service" method="post">
+
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <label for="serviceID">รหัส</label>
+                                <input type="text" id="id" class="form-control txtbox" value="<%= data.service_id%>" readonly placeholder="id"
+                                name="id">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="serviceName">ชื่อบริการ</label>
+                                <input type="text" id="name" class="form-control txtbox" value="<%= data.name%>" readonly placeholder="name"
+                                name="serviceName">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <label for="serviceCategory">ประเภท</label>
+                                <select id="category" class="form-control txtbox" readonly placeholder="category" name="serviceCategory">
+                                    <option value="<%= data.category_id%>">
+                                        <% if (data.category_id=== 1){ %>
+                                            ตรวจสุขภาพทั่วไป
+                                        <% } else if (data.category_id=== 2){ %>
+                                            ทันตกรรม
+                                        <% } else if (data.category_id=== 3){ %>
+                                            ฉีดวัคซีน
+                                        <% } else if (data.category_id=== 4){ %>
+                                            ศัลยกรรม
+                                        <% } else{%>
+                                            บริการสูติศาสตร์
+                                        <% }%>
+                                    </option>
+                                    <option value="1">ตรวจสุขภาพทั่วไป</option>
+                                    <option value="2">ทันตกรรม</option>
+                                    <option value="3">ฉีดวัคซีน</option>
+                                    <option value="4">ศัลยกรรม</option>
+                                    <option value="5">บริการสูติศาสตร์</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <label for="Price">ราคา</label>
+                                <input type="text" id="price" class="form-control txtbox" value="<%= data.price%>" readonly placeholder="price"
+                                name="price">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="serviceDuration">ระยะเวลา</label>
+                                <input type="text" id="duration" class="form-control txtbox" value="<%= data.duration%>"
+                        readonly placeholder="duration" name="serviceDuration">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <label for="serviceonlydoctor">เฉพาะแพทย์เท่านั้น</label>
+                                <select name="serviceonlydoctor" id="serviceonlydoctor" class="form-control txtbox" readonly>
+                                    <option value="<%= data.only_doctor%>">
+                                        <% if (data.only_doctor=== 'Yes'){ %>
+                                            🟢 ใช่
+                                        <% } else { %>
+                                            🔴 ไม่ใช่
+                                        <% } %>
+                                    </option>
+                                    <option value="No">🔴 ไม่ใช่</option>
+                                    <option value="Yes">🟢 ใช่</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="serviceStatus">สถานะ</label><br>
+                                <select name="serviceStatus" id="service_status" readonly class="form-control txtbox">
+                                    <option value="<%= data.status%>">
+                                        <% if (data.status=== 'Active'){ %>
+                                            🟢 เปิดให้บริการ
+                                        <% } else { %>
+                                            🔴 ปิดให้บริการ
+                                        <% } %>
+                                    </option>
+                                    <option value="Inactive">🔴 ปิดให้บริการ</option>
+                                    <option value="Active">🟢 เปิดให้บริการ</option>
+                                </select><br>
+                            </div>
+                        </div>
+
+                        <input onclick="toggleEdit()" type="button" value="แก้ไข" class="btn text-white bg-primary">
+                        <button class="btn btn-success" type="submit">บันทึก</button>
+                        <a class="btn text-white bg-danger" href="/showservices">ยกเลิก</a>
+                    </form>
+                </div>
             </div>
-        
+        </main>
+
         <%-include("script-toggle-edit")%>
         <%-include("main-content-bottom")%>
         <%-include("script-toggle-sidebar")%>

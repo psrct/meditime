@@ -1,5 +1,5 @@
 <%-include("head")%>
-<%-include("sidebar-doctor")%>
+<%-include("sidebar-owner")%>
 <%-include("main-content-top")%>
 <style>
     .form{
@@ -13,33 +13,65 @@
 </style>
     <body>
         <!-- ฟอร์มเพิ่ม Service -->
-        <h1>เพิ่มบริการ</h1>
-        <div id="serviceForm" class="d-flex form align-items-center justify-content-center">
-            <form action="/add-service" method="POST">
-                <label for="serviceID">รหัส</label><br>
-                <input type="text" id="service_id" name="serviceID" required class="rounded" placeholder="รหัส"><br>
-                <label for="serviceName">ชื่อบริการ</label><br>
-                <input type="text" id="name" name="serviceName" required class="rounded" placeholder="ชื่อบริการ"><br>
-                <label for="serviceCategory">หมวดหมู่</label><br>
-                <input type="text" id="category_id" name="serviceCategory" required class="rounded" placeholder="หมวดหมู่"><br>
-                <label for="Price">ราคา</label><br>
-                <input type="text" id="price" name="price" required class="rounded" placeholder="ราคา"><br>
-                <label for="serviceDuration">จำนวน</label><br>
-                <input type="text" id="service_name" name="serviceDuration" required class="rounded" placeholder="จำนวน"><br>
-                <label for="serviceonlydoctor">เฉพาะหมอ</label><br>
-                <select name="serviceonlydoctor" id="serviceonlydoctor" class="rounded">
-                    <option value="No">🔴 ไม่ใช่</option>
-                    <option value="Yes">🟢 ใช่</option>
-                </select><br>
-                <label for="serviceStatus">สถานะ</label><br>
-                <select name="serviceStatus" id="service_status" class="rounded">
-                    <option value="Inactive">🔴 ไม่ทำงาน</option>
-                    <option value="Active">🟢 กำลังทำงาน</option>
-                </select><br>
-                <button class="btn border text-white bg-primary my-2" type="submit">ยืนยัน</button>
-                <a class="btn border text-white bg-danger" href="/showservices">ยกเลิก</a>
-            </form>
-        </div>
+        <main class="p-3">
+            <div class="container-fluid">
+                <div class="container">
+                    <h1>เพิ่มบริการ</h1>
+                    <form action="/add-service" method="post">
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <label for="serviceID">รหัส</label>
+                                <input type="text" id="service_id" name="serviceID" required class="form-control" placeholder="รหัส">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="serviceName">ชื่อบริการ</label>
+                                <input type="text" id="name" name="serviceName" required class="form-control" placeholder="ชื่อบริการ">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="serviceCategory">ประเภท</label>
+                                <select name="serviceCategory" id="category_id" required class="form-control">
+                                    <option value="1">ตรวจสุขภาพทั่วไป</option>
+                                    <option value="2">ทันตกรรม</option>
+                                    <option value="3">ฉีดวัคซีน</option>
+                                    <option value="4">ศัลยกรรม</option>
+                                    <option value="5">บริการสูติศาสตร์</option>
+                                </select><br>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <label for="Price">ราคา</label>
+                                <input type="text" id="price" name="price" required class="form-control" placeholder="ราคา">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="serviceDuration">ระยะเวลา</label>
+                                <input type="text" id="service_name" name="serviceDuration" required class="form-control" placeholder="ระยะเวลา">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <label for="serviceonlydoctor">เฉพาะแพทย์เท่านั้น</label>
+                                <select name="serviceonlydoctor" id="serviceonlydoctor" required class="form-control">
+                                    <option value="No">🔴 ไม่ใช่</option>
+                                    <option value="Yes">🟢 ใช่</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="serviceStatus">สถานะ</label>
+                                <select name="serviceStatus" id="service_status" required class="form-control">
+                                    <option value="Inactive">🔴 ปิดให้บริการ</option>
+                                    <option value="Active">🟢 เปิดให้บริการ</option>
+                                </select><br>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" type="submit">ยืนยัน</button>
+                        <a class="btn text-white bg-danger" href="/showservices">ยกเลิก</a>
+                    </form>
+                </div>
+            </div>
+        </main>
         <%-include("main-content-bottom")%>
         <%-include("script-toggle-sidebar")%>
     </body>

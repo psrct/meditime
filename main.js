@@ -414,8 +414,8 @@ app.post('/edit-service',checkLoggedIn, isOwner, function (req, res) {
         updateData.serviceCategory,
         updateData.price,
         updateData.serviceDuration,
-        updateData.serviceStatus,
         updateData.serviceonlydoctor,
+        updateData.serviceStatus,
         updateData.serviceID
     ], (err) => {
         if (err) {
