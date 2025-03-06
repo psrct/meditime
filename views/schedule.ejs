@@ -4,24 +4,22 @@
         font-family: Arial, sans-serif;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        weight: 79vh;
         background-color: #f4f4f4;
     }
 
     .calendar {
-        min-width: 400px;
-        width: 35vw;
+        width: 550px;
         background: white;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         text-align: center;
     }
-    .days {
+
+    .grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 0.5vw;
+        gap: 10px;
     }
     .day, .weekday {
         padding: 10px;
@@ -41,13 +39,14 @@
 <body>
     <%-include("sidebar")%>
     <%-include("main-content-top")%>
+    <input id="date_input" type="date" onchange="changeDate()"><br>
     <div class="calendar">
         <div style="display:flex; align-items:center; justify-content:center;">
-            <button id="prev-month" class="nav-button" style="border:none; margin-right:5vw; font-size:1.5vw;"><</button>
+            <button id="prev-month" class="nav-button" style="border:none; font-size:25px; position:absolute; left:325px"><</button>
             <h2 id="month-year"></h2>
-            <button id="next-month" class="nav-button" style="border:none; margin-left:5vw; font-size:1.5vw;">></button>
+            <button id="next-month" class="nav-button" style="border:none; font-size:25px; position:absolute; left:790px">></button>
         </div>
-        <div class="days" id="calendar-days">
+        <div class="grid" id="calendar-days">
             <div class="weekday">Sun</div>
             <div class="weekday">Mon</div>
             <div class="weekday">Tue</div>
@@ -71,18 +70,27 @@
             window.location.href = `/schedule/${document.getElementById("date_input").value}`;
         }
 
+        document.getElementById("date_input").value = <%-JSON.stringify(search_date)%>;
+
         const today = new Date(<%-JSON.stringify(search_date)%>);
         
         const currentMonth = today.getMonth();
         const currentYear = today.getFullYear();
-        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const firstDateDay = new Date(currentYear, currentMonth, 1).getDay();
         const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
-        
+
+        document.getElementById("prev-month").onclick = function() {
+            changeCustomDate(DateToDateString(new Date(currentYear, currentMonth - 1, 1)));
+        };
+        document.getElementById("next-month").onclick = function() {
+            changeCustomDate(DateToDateString(new Date(currentYear, currentMonth + 1, 1)));
+        };
+
         document.getElementById("month-year").innerText = today.toLocaleString('default', { month: 'long', year: 'numeric' });
         
         let daysHTML = document.getElementById("calendar-days").innerHTML;
         
-        for (let i = 0; i < firstDay; i++) {
+        for (let i = 0; i < firstDateDay; i++) {
             daysHTML += '<div></div>';
         }
         
