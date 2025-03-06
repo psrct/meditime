@@ -5,30 +5,32 @@
         if(!isedit){
             console.log("not Editing")
 
-            let txtbox = document.getElementsByClassName("txtbox");
+            let txtbox = document.getElementsByClassName("form-control");
             let option = document.getElementsByClassName("option");
             for(let i=0; i<txtbox.length; i++){
                 txtbox.item(i).removeAttribute("readonly");
-                txtbox.item(i).style.color = "black";
+                txtbox.item(i).removeAttribute("disabled");
+                // txtbox.item(i).style.color = "black";
             }
             for(let i=0; i<option.length; i++){
                 option.item(i).removeAttribute("disabled");
-                option.item(i).style.color = "black";
+                // option.item(i).style.color = "black";
             }
             isedit = true;
             // console.log(isedit);
         }else{
             console.log("Editing")
             
-            let txtbox = document.getElementsByClassName("txtbox");
+            let txtbox = document.getElementsByClassName("form-control");
             let option = document.getElementsByClassName("option");
             for(let i=0; i<txtbox.length; i++){
                 txtbox.item(i).setAttribute("readonly", true);
-                txtbox.item(i).style.color = "rgb(157, 157, 157)";
+                txtbox.item(i).setAttribute("disabled", true);
+                // txtbox.item(i).style.color = "rgb(157, 157, 157)";
             }
             for(let i=0; i<option.length; i++){
                 option.item(i).setAttribute("disabled", true);
-                option.item(i).style.color = "rgb(157, 157, 157)";
+                // option.item(i).style.color = "rgb(157, 157, 157)";
             }
             isedit = false;
         }
