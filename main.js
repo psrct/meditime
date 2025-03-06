@@ -526,6 +526,9 @@ app.get('/queue', checkLoggedIn, isPatient, function (req, res) {
 });
 
 app.post('/queue-insert', checkLoggedIn, function (req, res) {
+  
+  const patient_id = req.session.user.id;
+
   if (req.body.date == null || req.body.date == undefined) {
     return res.send(feedback("การดำเนินการล้มเหลว: โปรดเลือกวันที่ของท่าน"));
   }
@@ -608,7 +611,7 @@ app.post('/queue-insert', checkLoggedIn, function (req, res) {
       const self_collision_subtasks_sql = ` SELECT s.task_id, s.subtask_no, s.room_id, s.doctor_id, s.service_id, s.start_datetime, s.end_datetime FROM Subtasks s\
                                             JOIN Tasks t\
                                             USING (task_id)\
-                                            WHERE t.patient_id = ${req.session.user.id}\
+                                            WHERE t.patient_id = ${patient_id}\
                                             AND DATETIME(s.start_datetime) < DATETIME("${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}")\
                                             AND DATETIME(s.end_datetime) > DATETIME("${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}"); `;
   
@@ -639,7 +642,7 @@ app.post('/queue-insert', checkLoggedIn, function (req, res) {
 
           for (let i = 0; i < insert_subtasks.length; i++) {
             inactive_room_sql = ` SELECT DISTINCT r.room_id, r.name FROM Rooms r\
-                              LEFT JOIN Subtasks\ s
+                              LEFT JOIN Subtasks s\
                               ON (r.room_id = s.room_id)\
                               AND DATETIME(start_datetime) < DATETIME("${DateToDateString(endDatetimeQueue)} ${DateToTimeString(endDatetimeQueue)}")\
                               AND DATETIME(end_datetime) > DATETIME("${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}")\
@@ -670,7 +673,7 @@ app.post('/queue-insert', checkLoggedIn, function (req, res) {
           
           // Start Queue
 
-          const patient_id = req.session.user.id;
+          
           const queue_tasks_sql = ` INSERT INTO Tasks (patient_id, start_datetime, end_datetime, is_completed, is_paid) VALUES\
                                   (${patient_id},\
                                   "${DateToDateString(startDatetimeQueue)} ${DateToTimeString(startDatetimeQueue)}",\
@@ -707,6 +710,14 @@ app.post('/queue-insert', checkLoggedIn, function (req, res) {
 
 
 app.get('/queue/:date', checkLoggedIn, function (req, res) {
+
+  // ป้องกันการใส่วันที่ไม่มีอยู่จริง
+  if (isNaN(new Date(req.params.date))) {
+    return res.redirect("/queue");
+  }
+
+  const patient_id = req.session.user.id;
+
   const tasks_sql = ` SELECT task_id, start_datetime, end_datetime FROM Tasks\
                       WHERE DATE(start_datetime) = "${req.params.date}" `
   const services_sql = ' SELECT * FROM Services\
@@ -722,10 +733,11 @@ app.get('/queue/:date', checkLoggedIn, function (req, res) {
                       WHERE s.status = "Active" AND only_doctor = "No" `
   db.all(tasks_sql, (tasks_err, tasks_rows) => {
     if (tasks_err) throw tasks_err;
-    const find_task_id = `(${tasks_rows.map(item => item.task_id).join(",")})`;
-    const subtasks_sql = ` SELECT task_id, subtask_no, doctor_id, service_id, start_datetime, end_datetime FROM Subtasks\
-                          WHERE task_id IN ${find_task_id}\
-                          ORDER BY task_id ASC, subtask_no ASC; `;
+    const subtasks_sql = ` SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.doctor_id AS 'doctor_id', st.service_id AS 'service_id', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', t.patient_id AS 'patient_id'\
+                          FROM (SELECT * FROM Subtasks WHERE DATE(start_datetime) = "${req.params.date}") st\
+                          JOIN Tasks t\
+                          USING (task_id)\
+                          ORDER BY st.task_id ASC, st.subtask_no ASC; `;
     db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
       if (subtasks_err) throw subtasks_err;
       db.all(services_sql, (services_err, services_rows) => {
@@ -739,6 +751,7 @@ app.get('/queue/:date', checkLoggedIn, function (req, res) {
                                   subtasks_data: subtasks_rows,
                                   doctors_data: doctors_rows,
                                   service_perms_data: service_perms_rows,
+                                  patient_data: patient_id,
                                   search_date: req.params.date
             });
           });
