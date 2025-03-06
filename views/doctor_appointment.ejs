@@ -2,19 +2,28 @@
 <body>
     <%-include("sidebar-doctor")%>
     <%-include("main-content-top")%>
-    <input list="patients_data" id="patient_selected" type="text" placeholder="รหัส หรือ ชื่อผู้ป่วย..." onchange="patients_filter()">
-    <datalist id="patients_data"></datalist>
-
-    <input id="doctor_selected" type="text" placeholder="myself" disabled>
-
-    <input type="datetime-local" id="start_datetime_appointment" required>
-    <input type="datetime-local" id="end_datetime_appointment" disabled>
-    
-    <input list="rooms_data" id="room_selected" type="text" placeholder="รหัสห้อง..." onchange="rooms_filter()">
-    <datalist id="rooms_data"></datalist>
-    <br><br>
-    <button id="comfirm_button" onclick="comfirm()">Comfirm</button>
-    <button id="Cancel_button">Cancel</button>
+    <div id="for-alert" style="height:98vh; width:98vw; position: absolute;"></div>
+    <a>วันที่ต้องการนัด : </a><input id="date_input" type="date" onchange="changeDate()"><br>
+    <a>หมอ : </a><input list="doctors_data" id="doctor_selected" type="text" disabled><br>
+    <div id="clock-time" style="width:30%; aspect-ratio: 1; margin-bottom:3vw; justify-content:center; display: flexbox; align-items: center;">
+        <canvas id="clocktext" width="400" height="400" style="position:absolute; width:30%; aspect-ratio:1;"></canvas>
+    </div>
+    <div id="appointment-below-container">
+        <a>ผู้ป่วย : </a><input list="patients_data" id="patient_selected" type="text" onchange="updateTasks();updateClockData();"><br>
+        <datalist id="patients_data"></datalist>
+        <a>เวลาที่ต้องการนัด : </a><input class="start_time_input" id="start_time_input" type="time" oninput="updateTasks();updateDuration();updateClockData();">
+        <a>ถึง : </a><input class="end_time_input" id="end_time_input" type="time" disabled><br>
+        <div id="services_container">
+            <!-- Service Select Appear Here! -->
+        </div><br>
+        <button id="add_service_button" onclick="addService();">+</button>
+        <br>
+        <a>ราคารวมบริการทั้งหมด : </a><input type="text" id="all-price-count" placeholder="0 บาท" disabled>
+        
+        <br><br><br>
+        <button id="appointment_button" onclick="appointment()">นัดผู้ป่วย</button>
+        <button id="cancel_button">ยกเลิก</button>
+    </div>
 
     <%-include("main-content-bottom")%>
     <%-include("script-toggle-sidebar")%>
@@ -22,73 +31,326 @@
 
     <!-- ---------------------------------------------------------- -->
 
-    <script>
+    <script><%-include('scripts/RadianFormat')%>
         <%-include('scripts/DateFormat')%>
 
-        const patients_datalist = document.getElementById("patients_data");
-        const rooms_datalist = document.getElementById("rooms_data");
 
+        const services_data = <%- JSON.stringify(services_data) %>;
+        const subtasks_data = <%- JSON.stringify(subtasks_data) %>;
         const patients_data = <%- JSON.stringify(patients_data) %>;
-        const rooms_data = <%- JSON.stringify(rooms_data) %>;
-        console.log(patients_data);
+
+        // Set Doctor Name From ID
+        const doctor_data = <%-JSON.stringify(doctor_data)%>;
+        document.getElementById("doctor_selected").placeholder = doctor_data[0].name + " (คุณ)";
+        document.getElementById("doctor_selected").style.width = (document.getElementById("doctor_selected").scrollWidth) + 'px';
+
+        let can_appointment = true;
+
+        document.getElementById("for-alert").style.visibility = "hidden";
+
+        document.getElementById("date_input").value = DateToDateString(new Date("<%=search_date%>"));
+
+        function changeDate() {
+            window.location.href = `/doctor_appointment/${document.getElementById("date_input").value}`;
+        }
+
+        let radianList = [];
+        let current_tasks_list = [];
+
+
+        function updateTasks() {
+            const patient_selected = document.getElementById("patient_selected").value;
+            const patient_selectedOption = [...document.getElementById("patients_data").options]
+                .find(option => option.value === patient_selected);
+            
+            current_tasks_list = [];
+
+            let selectedPatientId;
+            if (patient_selectedOption) {
+                selectedPatientId = patient_selectedOption.dataset.id;
+            } else {
+                selectedPatientId = -1;
+            }
+            subtasks_data.forEach(item => {
+                console.log(item.patient_id, selectedPatientId)
+                if (item.patient_id == selectedPatientId || item.doctor_id == doctor_data[0].id) {
+                    console.log("yes")
+                    current_tasks_list.push(item);
+                }
+            });
+        }
+        updateTasks();
+
+        // Creating clock and number
+        const canvasClockText = document.getElementById('clocktext');
+        const contextClockText = canvasClockText.getContext('2d');
+        const centerX = canvasClockText.width / 2;
+        const centerY = canvasClockText.height / 2;
+        const radius = 180;
+
+
+        function createClockNumber() {
+            const number_clock = [
+                { value: degreesToRadians(0),      number: '15' },
+                { value: degreesToRadians(30),     number: '16' },
+                { value: degreesToRadians(60),     number: '17' },
+                { value: degreesToRadians(90),     number: '18' },
+                { value: degreesToRadians(120),    number: '19' },
+                { value: degreesToRadians(150),    number: '20' },
+                { value: degreesToRadians(180),    number: '9' },
+                { value: degreesToRadians(210),    number: '10' },
+                { value: degreesToRadians(240),    number: '11' },
+                { value: degreesToRadians(270),    number: '12' },
+                { value: degreesToRadians(300),    number: '13' },
+                { value: degreesToRadians(330),    number: '14' }
+            ];
+
+            number_clock.forEach(item => {
+                const textX = centerX + (radius) * Math.cos(item.value);
+                const textY = centerY + (radius) * Math.sin(item.value);
+                
+                contextClockText.fillStyle = 'black';
+                contextClockText.font = '20px Arial';
+                contextClockText.fillText(item.number, textX - 10, textY + 8);
+            });
+        }
+
+
+        function updateClockData() {
+            contextClockText.clearRect(0, 0, canvasClockText.width, canvasClockText.height);
+            createClockNumber();
+
+            const timeList = [];
+            radianList = [];
+
+            // Already Tasks Queue / Appointment
+            current_tasks_list.forEach(item => {
+                timeList.push({start: new Date(item.start_datetime),
+                    end: new Date(item.end_datetime),
+                    status: "task"});
+            });
+
+            // User Selected appointment (If you can appointment)
+            if (can_appointment) {
+                const temToday = DateToDateString(getCurrentTHDatetime());
+                timeList.push({start: new Date(temToday + " " + document.getElementById("start_time_input").value + ":00"),
+                        end: new Date(temToday + " " + document.getElementById("end_time_input").value + ":00"),
+                        status: "selected"});
+            }
+
+            contextClockText.beginPath();
+            contextClockText.moveTo(centerX, centerY);
+            
+            timeList.forEach(item => {
+                radianList.push({start: degreesToRadians(180+((item.start.getHours()-9)*30)+(item.start.getMinutes()*0.5)),
+                                end: degreesToRadians(180+((item.end.getHours()-9)*30)+(item.end.getMinutes()*0.5)),
+                                status: item.status});
+            });
+            
+            drawClock();
+        }
+
+        function drawClock() {
+            // Disable Appointment (Clinic Closed)
+            contextClockText.beginPath();
+            contextClockText.moveTo(centerX, centerY);
+            contextClockText.arc(centerX, centerY, radius-15, degreesToRadians(150), degreesToRadians(180)); // Clinic Closed
+            contextClockText.closePath();
+
+            contextClockText.fillStyle = 'gray';
+            contextClockText.fill();
+
+            // Disable Appointment (Break Time)
+            contextClockText.beginPath();
+            contextClockText.moveTo(centerX, centerY);
+            contextClockText.arc(centerX, centerY, radius-15, degreesToRadians(270), degreesToRadians(300)); // Break Time
+            contextClockText.closePath();
+
+            contextClockText.fillStyle = 'gray';
+            contextClockText.fill();
+
+            // Already Tasks Queue / Appointment   &   User Selected Appointment
+            radianList.forEach(item => {
+                contextClockText.beginPath();
+                contextClockText.moveTo(centerX, centerY);
+                contextClockText.arc(centerX, centerY, (item.status == "task") ? radius-15 : radius-30, item.start, item.end);
+                contextClockText.closePath();
+
+                contextClockText.fillStyle = item.status == "task" ? "red" : "green";
+                contextClockText.fill();
+            });
+        }
+        updateClockData();
+
+        const services_container = document.getElementById("services_container");
+        const services_div_list = services_container.children;
+
+        let services_count = 0;
+
+        function services_filter(id) {
+            if (!can_appointment) return;
+            const temDiv = document.getElementById(id);
+            const tem_services_datalist = temDiv.querySelector("#services_data");
+
+            tem_services_datalist.innerHTML = "";
+            services_data.forEach(function(item) {
+                let temOption = document.createElement("option");
+                temOption.dataset.id = item.service_id;
+                temOption.dataset.duration = item.duration;
+                temOption.dataset.price = item.price;
+                temOption.innerHTML = item.price.toLocaleString() + " บาท";
+                temOption.value = item.name;
+                
+                tem_services_datalist.appendChild(temOption);
+            });
+        }
 
         function patients_filter() {
+            const patients_datalist = document.getElementById("patients_data");
+
             patients_datalist.innerHTML = "";
             patients_data.forEach(function(item) {
                 let temOption = document.createElement("option");
-                temOption.dataset.id = item.id;
-                temOption.innerHTML = item.id;
-                temOption.value = item.name;
+                temOption.dataset.id = item.patient_id;
+                temOption.value = item.prename + " " + item.firstname + " " + item.lastname;
                 
                 patients_datalist.appendChild(temOption);
             });
         }
         patients_filter();
 
-        function rooms_filter() {
-            rooms_datalist.innerHTML = "";
-            rooms_data.forEach(function(item) {
-                const temOption = document.createElement("option");
-                temOption.dataset.id = item.id;
-                temOption.innerHTML = item.name;
-                temOption.value = "ห้อง " + item.id;
+        function addService() {
+            if (!can_appointment) return;
+            services_count += 1;
+            const temDiv = document.createElement("div");
+            temDiv.innerHTML = `<a>บริการ: </a><input list="services_data" class="service_selected" type="text" placeholder="ชื่อบริการ..." onchange="services_filter(${services_count});updateServiceData(${services_count});updateDuration();updateAllPrice();updateClockData();">\
+                                <datalist id="services_data"></datalist>\
+                                <a>ระยะเวลาบริการ : </a><input class="duration_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>\
+                                <a>ราคาบริการ : </a><input class="price_input" type="number" placeholder="ไม่พบข้อมูลบริการ" disabled>` +
+                                (services_count != 1 ? `<button onclick="removeService(${services_count});updateDuration();updateAllPrice();updateClockData();">-</button>` : ``);
+            temDiv.id = services_count;
+
+            services_container.appendChild(temDiv);
+            
+            services_filter(services_count);
+        }
+        addService();
+
+        function updateServiceData(id) {
+            if (!can_appointment) return;
+            const temDiv = document.getElementById(id);
+
+            const service_selected = temDiv.querySelector(".service_selected").value;
+            const service_selectedOption = [...temDiv.querySelector("#services_data").options]
+                .find(option => option.value === service_selected);
+            
+            if (service_selectedOption) {
+                const temPrice = service_selectedOption.dataset.price.toLocaleString() + " บาท";
+                const temDuration = service_selectedOption.dataset.duration;
+                const temDurationString = ((temDuration >= 60) ? ( Math.floor( temDuration / 60) ) + " ชั่วโมง " : "") + 
+                                    ( Math.floor( temDuration % 60) ) + " นาที";
+                temDiv.querySelector(".duration_input").placeholder = temDurationString;
+                temDiv.querySelector(".price_input").placeholder = temPrice;
+            } else {
+                temDiv.querySelector(".duration_input").placeholder = "ไม่พบข้อมูลบริการ";
+                temDiv.querySelector(".price_input").placeholder = "ไม่พบข้อมูลบริการ";
+            }
+        }
+
+        function removeService(id) {
+            if (!can_appointment) return;
+            const temDiv = document.getElementById(id);
+            services_container.removeChild(temDiv);
+        }
+
+        function appointment() {
+            const subtasksList = [];
+            
+            Array.from(services_div_list).forEach(function(item) {
+                const service_selected = item.querySelector(".service_selected").value;
+                const service_selectedOption = [...item.querySelector("#services_data").options]
+                    .find(option => option.value === service_selected);
                 
-                rooms_datalist.appendChild(temOption);
+                if (service_selectedOption) {
+                    subtasksList.push(service_selectedOption.dataset.id);
+                }
+            });
+
+            const patient_selectedOption = [...document.getElementById("patients_data").options]
+                .find(option => option.value === document.getElementById("patient_selected").value);
+
+            let patient_id_input;
+            if (patient_selectedOption) {
+                patient_id_input = patient_selectedOption.dataset.id;
+            }
+
+            let appointmentData = {
+                    date: document.getElementById("date_input").value,
+                    patient_id: patient_id_input,
+                    start_time: document.getElementById("start_time_input").value,
+                    subtasks: subtasksList
+            };
+            console.log(appointmentData)
+
+            fetch('/appointment-insert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(appointmentData)
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("for-alert").innerHTML = data;
+                document.getElementById("for-alert").style.visibility = "visible";
+            })
+            .catch((error) => {
+                console.error('Error:', error);
             });
         }
-        rooms_filter();
+
+        // Update Duration
+        function updateDuration() {
+            if (!can_appointment) return;
+            let destTime = new Date(`<%-JSON.stringify(search_date)%>` + document.getElementById("start_time_input").value + ":00");
+
+            if (isNaN(destTime.getTime())) return;
+
+            Array.from(services_div_list).forEach(function(item) {
+                if (item.querySelector(".duration_input").placeholder.split(" ")[1] === "ชั่วโมง") {
+                    destTime.setMinutes(destTime.getMinutes() + 60*parseInt(item.querySelector(".duration_input").placeholder.split(" ")[0])
+                                        + parseInt(item.querySelector(".duration_input").placeholder.split(" ")[2]));
+                } else if (item.querySelector(".duration_input").placeholder.split(" ")[1] === "นาที") {
+                    destTime.setMinutes(destTime.getMinutes() + parseInt(item.querySelector(".duration_input").placeholder.split(" ")[0]));
+                } else {
+                    document.getElementById("end_time_input").value = "";
+                }
+            });
+
+            document.getElementById("end_time_input").value = DateToTimeString(destTime);
+            
+        }
+
+        // Update All Price Count
+        function updateAllPrice() {
+            if (!can_appointment) return;
+            let allprice = 0;
+
+            Array.from(services_div_list).forEach(function(item) {
+                if (item.querySelector(".price_input").placeholder.split(" ")[1] === "บาท") {
+                    allprice += parseInt(item.querySelector(".price_input").placeholder.split(" ")[0]);
+                }
+            });
+            document.getElementById("all-price-count").placeholder = allprice + " บาท";
+        }
         
-        function comfirm() {
-            const patient_selected = document.getElementById("patient_selected").value;
-            const patient_selectedOption = [...document.getElementById("patients_data").options]
-                .find(option => option.value === patient_selected);
-            
-            if (patient_selectedOption) {
-                const selectedId = patient_selectedOption.dataset.id;
-                console.log("รหัสผู้ป่วย: ", selectedId);
-            } else {
-                console.log("ไม่พบข้อมูลผู้ป่วย");
-            }
-
-            if (document.getElementById("start_datetime_appointment").value != "") {
-                const datetime_appointment = DMYToYMDTime(ISO8601ToYMDTime(new Date(document.getElementById("start_datetime_appointment").value)))
-
-                console.log("วันเวลานัดหมาย: ", datetime_appointment);
-            } else {
-                console.log("กรุณาเลือกวันเวลานัดหมาย");
-            }
-
-            const room_selected = document.getElementById("room_selected").value;
-            const room_selectedOption = [...document.getElementById("rooms_data").options]
-                .find(option => option.value === room_selected);
-            
-            if (room_selectedOption) {
-                const selectedId = room_selectedOption.dataset.id;
-                console.log("รหัสห้อง: ", selectedId);
-            } else {
-                console.log("ไม่พบข้อมูลรหัสห้อง");
-            }
-        };
+        // Check Can Appointment On This Date?
+        if (new Date(`<%=search_date%> 07:00:00`).getTime() < new Date(DateToDateString(new Date())).getTime()) {
+            document.getElementById("appointment-below-container").innerHTML = "ไม่สามารถนัดในวันที่ผ่านมาแล้วได้";
+            can_appointment = false;
+        } else {
+            can_appointment = true;
+        }
     </script>
 </body>
 </html>
