@@ -2,7 +2,7 @@
 <body>
     <%-include("sidebar-doctor")%>
     <%-include("main-content-top")%>
-    <div id="for-alert" style="height:98vh; width:98vw; position: absolute;"></div>
+    <div id="for-alert" style="height:98vh; width:79vw; position: absolute; z-index:2"></div>
     <a>วันที่ต้องการนัด : </a><input id="date_input" type="date" onchange="changeDate()"><br>
     <a>หมอ : </a><input list="doctors_data" id="doctor_selected" type="text" disabled><br>
     <div id="clock-time" style="width:30%; aspect-ratio: 1; margin-bottom:3vw; justify-content:center; display: flexbox; align-items: center;">
