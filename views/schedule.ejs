@@ -1,10 +1,98 @@
 <%-include("head")%>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        weight: 79vh;
+        background-color: #f4f4f4;
+    }
+
+    .calendar {
+        min-width: 400px;
+        width: 35vw;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5vw;
+    }
+    .day, .weekday {
+        padding: 10px;
+        background: #ddd;
+        border-radius: 5px;
+    }
+    .weekday {
+        font-weight: bold;
+        background: #bbb;
+    }
+    .day.today {
+        background: #ff6347;
+        color: white;
+        font-weight: bold;
+    }
+</style>
 <body>
     <%-include("sidebar")%>
     <%-include("main-content-top")%>
-
+    <div class="calendar">
+        <div style="display:flex; align-items:center; justify-content:center;">
+            <button id="prev-month" class="nav-button" style="border:none; margin-right:5vw; font-size:1.5vw;"><</button>
+            <h2 id="month-year"></h2>
+            <button id="next-month" class="nav-button" style="border:none; margin-left:5vw; font-size:1.5vw;">></button>
+        </div>
+        <div class="days" id="calendar-days">
+            <div class="weekday">Sun</div>
+            <div class="weekday">Mon</div>
+            <div class="weekday">Tue</div>
+            <div class="weekday">Wed</div>
+            <div class="weekday">Thu</div>
+            <div class="weekday">Fri</div>
+            <div class="weekday">Sat</div>
+        </div>
+    </div>
     <%-include("main-content-bottom")%>
     <%-include("script-toggle-sidebar")%>
+
+    <script>
+        <%-include('scripts/DateFormat')%>
+
+        function changeCustomDate(datestring) {
+            window.location.href = `/schedule/${datestring}`;
+        }
+
+        function changeDate() {
+            window.location.href = `/schedule/${document.getElementById("date_input").value}`;
+        }
+
+        const today = new Date(<%-JSON.stringify(search_date)%>);
+        
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+        
+        document.getElementById("month-year").innerText = today.toLocaleString('default', { month: 'long', year: 'numeric' });
+        
+        let daysHTML = document.getElementById("calendar-days").innerHTML;
+        
+        for (let i = 0; i < firstDay; i++) {
+            daysHTML += '<div></div>';
+        }
+        
+        for (let day = 1; day <= lastDate; day++) {
+            const isToday = (day === today.getDate());
+            daysHTML += `<div class="day ${isToday ? 'today' : ''}" style="cursor:pointer;" onclick="changeCustomDate('${DateToDateString(new Date(currentYear, currentMonth, day))}')">${day}</div>`;
+        }
+        
+        document.getElementById("calendar-days").innerHTML = daysHTML;
+    </script>
 </body>
 
 </html>
