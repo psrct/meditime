@@ -1021,8 +1021,85 @@ app.get('/queue/:date', checkLoggedIn, isPatient, function (req, res) {
 
 
 
-app.listen(port, () => {
-    console.log(`listening to port ${port}`);
-}); 
+// ----------------------- Schedule ----------------------- //
 
-// -------------------------------------------------------- //
+app.get('/schedule', checkLoggedIn, function (req, res) {
+
+  // นำไปสู่หน้าจองคิวในวันนี้ทันที
+
+  const todayDate = new Date();
+  res.redirect(`/schedule/${DateToDateString(todayDate)}`);
+});
+
+
+app.get('/schedule/:date', checkLoggedIn, function (req, res) {
+
+  // ป้องกันการใส่วันที่ไม่มีอยู่จริง
+  if (isNaN(new Date(req.params.date))) {
+    return res.redirect("/schedule");
+  }
+
+  const tasks_sql = ` SELECT * FROM Tasks\
+                      WHERE DATE(start_datetime) = "${req.params.date}" `
+
+  const id = req.session.user.id;
+  if (req.session.user.usertype == "patient") {
+    const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.doctor_id AS 'doctor_id', CONCAT(d.prename + " " + d.firstname + " " + d.lastname) AS 'doctor_name', s.name AS 'Specialty', \
+                          st.room_id AS 'room_id', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
+                          \
+                          JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}")\
+                          USING (task_id)\
+                          JOIN Services sv\
+                          USING (service_id)\
+                          JOIN Service_categories sc\
+                          USING (category_id)\
+                          JOIN Doctors d\
+                          USING (doctor_id)\
+                          JOIN Specialties s\
+                          USING (specialty_id)
+                          WHERE patient_id = ${id}\
+                          ORDER BY DATETIME(st.start_datetime) ASC; `
+
+    db.all(tasks_sql, (tasks_err, tasks_rows) => {
+      if (tasks_err) throw tasks_err;
+      db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
+        if (subtasks_err) throw subtasks_err;
+        console.log(subtasks_rows);
+        res.render('schedule', { tasks_data: tasks_rows,
+                                subtasks_data: subtasks_rows,
+                                search_date: req.params.date
+         });
+      });
+    });
+  } else if (req.session.user.usertype == "doctor") {
+    const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', CONCAT(p.prename + " " + p.firstname + " " + p.lastname) AS 'patient_name', \
+                          st.room_id AS 'room_id', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
+                          \
+                          JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}")\
+                          USING (task_id)\
+                          JOIN Services sv\
+                          USING (service_id)\
+                          JOIN Service_categories sc\
+                          USING (category_id)\
+                          JOIN Patients p\
+                          USING (patient_id)\
+                          WHERE doctor_id = ${id}\
+                          ORDER BY DATETIME(st.start_datetime) ASC; `
+
+    db.all(tasks_sql, (tasks_err, tasks_rows) => {
+      if (tasks_err) throw tasks_err;
+      db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
+        if (subtasks_err) throw subtasks_err;
+        console.log(subtasks_rows);
+        res.render('schedule', { tasks_data: tasks_rows,
+                                subtasks_data: subtasks_rows,
+                                search_date: req.params.date
+          });
+      });
+    });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`listening to port ${port}`);
+}); 
