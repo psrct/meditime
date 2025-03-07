@@ -56,6 +56,9 @@
     <%-include("main-content-bottom")%>
     <%-include("script-toggle-sidebar")%>
     <script>
+
+        document.getElementById("logo").removeAttribute("src");
+        document.getElementById("logo").setAttribute("src", "../logo.png");
         <%-include('scripts/RadianFormat')%>
         <%-include('scripts/DateFormat')%>
 
