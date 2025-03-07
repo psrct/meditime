@@ -207,15 +207,50 @@ app.post('/profile', checkLoggedIn, isPatient, function(req, res){
     });
 })
 
-app.get('/history',checkLoggedIn, isPatient, function (req, res) {
-  const query = 'SELECT * FROM Tasks;';
-  db.all(query, (err, rows) => {
-    if (err) {
-      console.log(err.message);
-    }
-    console.log(rows);
-    res.render('data', { data: rows });
-  });
+app.get('/history', checkLoggedIn, function (req, res) {
+  if (req.session.user.usertype == "patient") {
+    const task_query = ` SELECT * FROM Tasks\
+                        WHERE patient_id = ${req.session.user.id}; `;
+    const subtask_query = `SELECT * FROM Subtasks\
+                          WHERE patient_id = ${req.session.user.id}; `;
+    db.all(task_query, (err, tasks_rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(tasks_rows);
+
+      db.all(subtask_query, (err, subtasks_rows) => {
+        if (err) {
+          console.log(err.message);
+        }
+        console.log(subtasks_rows);
+
+        res.render('data', { tasks_data: tasks_rows,
+                              subtasks_data: subtasks_rows
+         });
+      });
+    });
+  } else if (req.session.user.usertype == "doctor") {
+    const subtask_query = ` SELECT * FROM Subtasks\
+                          WHERE doctor_id = ${req.session.user.id}; `;
+    db.all(task_query, (err, tasks_rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+      console.log(tasks_rows);
+
+      db.all(subtask_query, (err, subtasks_rows) => {
+        if (err) {
+          console.log(err.message);
+        }
+        console.log(subtasks_rows);
+
+        res.render('data', { tasks_data: tasks_rows,
+                              subtasks_data: subtasks_rows
+         });
+      });
+    });
+  }
 });
 
 // -------------------------------------- FOR CLINIC OWNER -------------------------------------------------------

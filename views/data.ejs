@@ -3,6 +3,7 @@
   <body>
     <%-include("sidebar")%>
     <%-include("main-content-top")%>
+    <input type="text" id="search-bar" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ...">
     <h1>Table Of Task</h1>
     <table>
       <thead>
@@ -16,7 +17,7 @@
       </thead>
 
       <tbody>
-        <% data.forEach((item)=> { %>
+        <% tasks_data.forEach((item)=> { %>
           <tr>
             <td>
               <%= item.task_id %>
@@ -39,6 +40,9 @@
     </table>
     <%-include("main-content-bottom")%>
     <%-include("script-toggle-sidebar")%>
+    <script>
+
+    </script>
   </body>
 
   </html>
