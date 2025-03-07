@@ -218,9 +218,11 @@
         function showTasks() {
             const task_container = document.getElementById("task-container");
 
-            tasks_data.forEach(task => {
-                task_container.appendChild(createTaskBar(task));
-            });
+            <% if(user.usertype == "patient"){ %>
+                tasks_data.forEach(task => {
+                    task_container.appendChild(createTaskBar(task));
+                });
+            <% } %>
         }
         showTasks();
     </script>
