@@ -1065,6 +1065,11 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
     return res.redirect("/schedule");
   }
 
+  if (req.session.user.usertype != "patient" && req.session.user.usertype != "doctor") {
+    return res.redirect("/");
+  };
+
+
   const id = req.session.user.id;
 
   const month_tasks_sql = ` SELECT DISTINCT CAST(strftime('%d', start_datetime) AS INTEGER) AS 'day' FROM Tasks\
