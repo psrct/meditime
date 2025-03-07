@@ -12,6 +12,7 @@
 
     .calendar {
         width: 550px;
+        height: 450px;
         background: white;
         padding: 20px;
         border-radius: 10px;
@@ -38,6 +39,10 @@
         background: #ff6347;
         color: white;
         font-weight: bold;
+    }
+
+    .day.queue {
+        background: #2bb921;
     }
 
     .task-container {
@@ -138,9 +143,11 @@
             daysHTML += '<div></div>';
         }
         
+        const month_tasks_data = <%-JSON.stringify(month_tasks_data)%>;
+
         for (let day = 1; day <= lastDate; day++) {
             const isToday = (day === today.getDate());
-            daysHTML += `<div class="day ${isToday ? 'today' : ''}" style="cursor:pointer;" onclick="changeCustomDate('${DateToDateString(new Date(currentYear, currentMonth, day))}')">${day}</div>`;
+            daysHTML += `<div class="day ${isToday ? 'today' : (month_tasks_data.find(task => task.day === day) ? 'queue' : '')}" style="cursor:pointer;" onclick="changeCustomDate('${DateToDateString(new Date(currentYear, currentMonth, day))}')">${day}</div>`;
         }
         
         document.getElementById("calendar-days").innerHTML = daysHTML;
@@ -149,6 +156,7 @@
 
         const tasks_data = <%-JSON.stringify(tasks_data)%>;
         const subtasks_data = <%-JSON.stringify(subtasks_data)%>;
+        
 
 
         function createTaskBar(task) {

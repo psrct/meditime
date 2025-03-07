@@ -1067,65 +1067,72 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
 
   const id = req.session.user.id;
 
+  const month_tasks_sql = ` SELECT DISTINCT CAST(strftime('%d', start_datetime) AS INTEGER) AS 'day' FROM Tasks\
+                            WHERE strftime('%m', start_datetime) = "${req.params.date.split('-')[1]}" \
+                            AND ${req.session.user.usertype}_id = ${id}; `
+
   const tasks_sql = ` SELECT * FROM Tasks\
                       WHERE DATE(start_datetime) = "${req.params.date}" \
                       AND ${req.session.user.usertype}_id = ${id}; `
 
-  if (req.session.user.usertype == "patient") {
-    const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.doctor_id AS 'doctor_id', CONCAT(d.prename + " " + d.firstname + " " + d.lastname) AS 'doctor_name', s.name AS 'Specialty', \
-                          st.room_id AS 'room_id', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
-                          \
-                          JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}")\
-                          USING (task_id)\
-                          JOIN Services sv\
-                          USING (service_id)\
-                          JOIN Service_categories sc\
-                          USING (category_id)\
-                          JOIN Doctors d\
-                          USING (doctor_id)\
-                          JOIN Specialties s\
-                          USING (specialty_id)
-                          WHERE patient_id = ${id}\
-                          ORDER BY DATETIME(st.start_datetime) ASC; `
+  db.all(month_tasks_sql, (month_tasks_err, month_tasks_rows) => {
+    if (month_tasks_err) throw month_tasks_err;
 
     db.all(tasks_sql, (tasks_err, tasks_rows) => {
       if (tasks_err) throw tasks_err;
-      console.log(tasks_rows)
-      db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
-        if (subtasks_err) throw subtasks_err;
-        res.render('schedule', { tasks_data: tasks_rows,
-                                subtasks_data: subtasks_rows,
-                                search_date: req.params.date
-         });
-      });
-    });
-  } else if (req.session.user.usertype == "doctor") {
-    const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', CONCAT(p.prename + " " + p.firstname + " " + p.lastname) AS 'patient_name', \
-                          st.room_id AS 'room_id', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
-                          \
-                          JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}")\
-                          USING (task_id)\
-                          JOIN Services sv\
-                          USING (service_id)\
-                          JOIN Service_categories sc\
-                          USING (category_id)\
-                          JOIN Patients p\
-                          USING (patient_id)\
-                          WHERE doctor_id = ${id}\
-                          ORDER BY DATETIME(st.start_datetime) ASC; `
 
-    db.all(tasks_sql, (tasks_err, tasks_rows) => {
-      if (tasks_err) throw tasks_err;
-      db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
-        if (subtasks_err) throw subtasks_err;
-        console.log(subtasks_rows);
-        res.render('schedule', { tasks_data: tasks_rows,
-                                subtasks_data: subtasks_rows,
-                                search_date: req.params.date
-          });
-      });
+      if (req.session.user.usertype == "patient") {
+        const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.doctor_id AS 'doctor_id', CONCAT(d.prename + " " + d.firstname + " " + d.lastname) AS 'doctor_name', s.name AS 'Specialty', \
+                              st.room_id AS 'room_id', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
+                              \
+                              JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}")\
+                              USING (task_id)\
+                              JOIN Services sv\
+                              USING (service_id)\
+                              JOIN Service_categories sc\
+                              USING (category_id)\
+                              JOIN Doctors d\
+                              USING (doctor_id)\
+                              JOIN Specialties s\
+                              USING (specialty_id)
+                              WHERE patient_id = ${id}\
+                              ORDER BY DATETIME(st.start_datetime) ASC; `
+
+        db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
+          if (subtasks_err) throw subtasks_err;
+          res.render('schedule', { tasks_data: tasks_rows,
+                                  subtasks_data: subtasks_rows,
+                                  month_tasks_data: month_tasks_rows,
+                                  search_date: req.params.date
+            });
+        });
+      } else if (req.session.user.usertype == "doctor") {
+        const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', CONCAT(p.prename + " " + p.firstname + " " + p.lastname) AS 'patient_name', \
+                              st.room_id AS 'room_id', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
+                              \
+                              JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}")\
+                              USING (task_id)\
+                              JOIN Services sv\
+                              USING (service_id)\
+                              JOIN Service_categories sc\
+                              USING (category_id)\
+                              JOIN Patients p\
+                              USING (patient_id)\
+                              WHERE doctor_id = ${id}\
+                              ORDER BY DATETIME(st.start_datetime) ASC; `
+
+        db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
+          if (subtasks_err) throw subtasks_err;
+          console.log(subtasks_rows);
+          res.render('schedule', { tasks_data: tasks_rows,
+                                  subtasks_data: subtasks_rows,
+                                  month_tasks_data: month_tasks_rows,
+                                  search_date: req.params.date
+            });
+        });
+      }
     });
-  }
+  });
 });
 
 app.listen(port, () => {
