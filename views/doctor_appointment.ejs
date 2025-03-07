@@ -31,7 +31,10 @@
 
     <!-- ---------------------------------------------------------- -->
 
-    <script><%-include('scripts/RadianFormat')%>
+    <script>
+        document.getElementById("logo").removeAttribute("src");
+        document.getElementById("logo").setAttribute("src", "../logo.png");
+        <%-include('scripts/RadianFormat')%>
         <%-include('scripts/DateFormat')%>
 
 
