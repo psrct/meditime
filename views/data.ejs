@@ -2,55 +2,59 @@
 
   <body>
     <%-include("sidebar")%>
-    <%-include("main-content-top")%>
-    <input type="text" id="search-bar" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ..." oninput="">
-    <h1>Table Of Task</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>TaskID</th>
-          <th>PatientID</th>
-          <th>Start</th>
-          <th>End</th>
-          <th>Completed?</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <% tasks_data.forEach((item)=> { %>
-          <tr>
-            <td>
-              <%= item.task_id %>
-            </td>
-            <td>
-              <%= item.patient_id %>
-            </td>
-            <td>
-              <%= item.start_datetime %>
-            </td>
-            <td>
-              <%= item.end_datetime %>
-            </td>
-            <td>
-              <%= item.is_completed ? "✅" : "❌" %>
-            </td>
-          </tr>
-          <% }) %>
-      </tbody>
-    </table>
-    <%-include("main-content-bottom")%>
-    <%-include("script-toggle-sidebar")%>
-    <script>
+      <%-include("main-content-top")%>
+        <div class="container mt-4">
+          <input type="text" id="search-bar" class="form-control mb-3" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ..."
+            oninput="tasks_filter()">
+          <h1 class="mb-3">Table Of Task</h1>
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+              <thead class="table-dark">
+                <tr>
+                  <th>TaskID</th>
+                  <th>PatientID</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Completed?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% tasks_data.forEach((item)=> { %>
+                  <tr>
+                    <td>
+                      <%= item.task_id %>
+                    </td>
+                    <td>
+                      <%= item.patient_id %>
+                    </td>
+                    <td>
+                      <%= item.start_datetime %>
+                    </td>
+                    <td>
+                      <%= item.end_datetime %>
+                    </td>
+                    <td class="text-center">
+                      <%= item.is_completed ? "✅" : "❌" %>
+                    </td>
+                  </tr>
+                  <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <%-include("main-content-bottom")%>
+          <%-include("script-toggle-sidebar")%>
+            <script>
 
       <% if (user.usertype == "patient") { %>
-        const tasks_data = <%-JSON.stringify(tasks_data)%>;
+        const tasks_data = <% -JSON.stringify(tasks_data) %>;
       <% } %>
-      const subtasks_data = <%-JSON.stringify(subtasks_data)%>;
+      const subtasks_data = <% -JSON.stringify(subtasks_data) %>;
 
-      function tasks_filter() {
+              function tasks_filter() {
 
-      }
-    </script>
+              }
+            </script>
   </body>
 
   </html>
