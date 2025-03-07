@@ -101,7 +101,7 @@ app.post('/login-staff', function(req, res){
         usertype: "doctor",
         isLoggedin: true
       }
-      res.redirect("/doctor_home");
+      res.redirect("/schedule");
     }
   });
 });

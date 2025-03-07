@@ -46,12 +46,25 @@
     }
 
     .task {
-        width: 550px;
+        width: 400px;
         background: white;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         text-align: center;
+        margin-bottom: 20px
+    }
+    #flex{
+        display: flex;
+    }
+    @media (max-width: 1200px){
+        #flex{
+            display: grid;
+            gap: 30px;
+        }
+        .task-container {
+            width: 400px;
+        }
     }
 </style>
 <body>
@@ -61,27 +74,30 @@
         <%-include("sidebar")%>
     <% } %>
     <%-include("main-content-top")%>
-    <input id="date_input" type="date" onchange="changeDate()"><br>
-    <div style="display: flex;">
-        <div class="calendar">
-            <div style="display:flex; align-items:center; justify-content:center;">
-                <button id="prev-month" class="nav-button" style="border:none; font-size:25px; position:absolute; left:325px"><</button>
-                <h2 id="month-year"></h2>
-                <button id="next-month" class="nav-button" style="border:none; font-size:25px; position:absolute; left:790px">></button>
+    <div class="container">
+        <input id="date_input" type="date" onchange="changeDate()" class="form-control col-md-5"><br>
+        <div id="flex">
+            <div class="calendar">
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <button id="prev-month" class="nav-button" style="border:none; font-size:25px; position:flex; left:325px; margin-right:20px;"><</button>
+                    <h2 id="month-year"></h2>
+                    <button id="next-month" class="nav-button" style="border:none; font-size:25px; position:flex; left:790px; margin-left:20px;">></button>
+                </div>
+                <div class="grid" id="calendar-days">
+                    <div class="weekday">Sun</div>
+                    <div class="weekday">Mon</div>
+                    <div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div>
+                    <div class="weekday">Thu</div>
+                    <div class="weekday">Fri</div>
+                    <div class="weekday">Sat</div>
+                </div>
             </div>
-            <div class="grid" id="calendar-days">
-                <div class="weekday">Sun</div>
-                <div class="weekday">Mon</div>
-                <div class="weekday">Tue</div>
-                <div class="weekday">Wed</div>
-                <div class="weekday">Thu</div>
-                <div class="weekday">Fri</div>
-                <div class="weekday">Sat</div>
+            <div class="task-container" id="task-container">
             </div>
-        </div>
-        <div class="task-container" id="task-container">
         </div>
     </div>
+    
     <%-include("main-content-bottom")%>
     <%-include("script-toggle-sidebar")%>
 
@@ -147,11 +163,19 @@
             const is_completed = document.createElement("p");
             const subtaskServiceList = document.createElement("p");
 
-            task_id.innerHTML = `${task.task_id}`;
-            start_datetime.innerHTML = `${task.start_datetime}`;
-            end_datetime.innerHTML = `${task.end_datetime}`;
-            is_paid.innerHTML = `${task.is_paid}`;
-            is_completed.innerHTML = `${task.is_completed}`;
+            task_id.innerHTML = `รหัส : ${task.task_id}`;
+            start_datetime.innerHTML = `วัน/เวลาที่เริ่ม : ${task.start_datetime}`;
+            end_datetime.innerHTML = `วัน/เวลาที่เสร็จสิ้น : ${task.end_datetime}`;
+            if(task.is_paid==="No"){
+                is_paid.innerHTML = `การชำระเงิน : ยังไม่ได้ชำระเงิน`;
+            }else{
+                is_paid.innerHTML = `การชำระเงิน : ชำระเงินแล้ว`;
+            }
+            if(task.is_completed==="No"){
+                is_completed.innerHTML = `สถานะ : ยังไม่เสร็จสิ้น`;
+            }else{
+                is_completed.innerHTML = `สถานะ : เสร็จสิ้น`;
+            }
 
 
             const allSubtasks = subtasks_data.filter(subtask => subtask.task_id == task.task_id);
