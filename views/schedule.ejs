@@ -37,7 +37,11 @@
     }
 </style>
 <body>
-    <%-include("sidebar")%>
+    <% if(user.usertype == "doctor"){ %>
+        <%-include("sidebar-doctor")%>
+    <% } else { %>
+        <%-include("sidebar")%>
+    <% } %>
     <%-include("main-content-top")%>
     <input id="date_input" type="date" onchange="changeDate()"><br>
     <div class="calendar">

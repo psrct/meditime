@@ -4,9 +4,6 @@
         font-size: 18px;
     }
 
-    .txtbox{
-        color: rgb(157, 157, 157);
-    }
 
     .option{
         color: rgb(157, 157, 157);
@@ -15,30 +12,69 @@
 <body>
     <%-include("sidebar")%>
     <%-include("main-content-top")%>
-    <form action="/profile" method="post">
-        <input id="username" class="txtbox" name="username" value="<%=data[0].username%>" readonly><br> <br>
-        <select id="prename" class="option" name="prename" disabled>;
-            <option value="นาย" id="mister">นาย</option>
-            <option value="นางสาว" id="miss">นางสาว</option>
-            <option value="เด็กชาย" id="boy">เด็กชาย</option>
-            <option value="เด็กหญิง" id="girl">เด็กหญิง</option>
-        </select>
-       
-        <input id="firstname" class="txtbox" name="firstname" value="<%=data[0].firstname%>" readonly><br><br>
-        <input id="lastname" class="txtbox" name="lastname" value="<%=data[0].lastname%>" readonly><br><br>
-        <input id="iden_id" class="txtbox" name="iden_id" value="<%=data[0].iden_id%>" readonly><br><br>
-        <input id="contact_number" class="txtbox" name="contact_number" value="<%=data[0].contact_number%>" readonly><br><br>
-        <input id="add_contact" class="txtbox" name="add_contact" value="<%=data[0].add_contact_number%>" readonly><br><br>
-        <input id="medical_conditions" class="txtbox" name="medical_conditions" value="<%=data[0].medical_conditions%>" readonly><br><br>
-        <input id="birth_date" class="txtbox" name="birth_date" value="<%=data[0].birth_date%>" readonly><br><br>
-        
-        <select id="gender" class="option" name="gender" disabled>
-            <option value="Male" id="male">Male</option>
-            <option value="Female" id="female">Female</option>
-        </select>
-        <input onclick="toggleEdit()" type="button" value="Edit">
-        <input type="submit" value="Save">
-    </form>
+    <div class="container">
+        <form action="/profile" method="post">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="username">ชื่อผู้ใช้</label>
+                    <input id="username" class="form-control" name="username" value="<%=data[0].username%>" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="prename">คำนำหน้า</label>
+                    <select id="prename" class="form-control" name="prename" disabled>;
+                        <option value="นาย" id="mister">นาย</option>
+                        <option value="นางสาว" id="miss">นางสาว</option>
+                        <option value="เด็กชาย" id="boy">เด็กชาย</option>
+                        <option value="เด็กหญิง" id="girl">เด็กหญิง</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-5">
+                    <label for="firstname">ชื่อจริง</label>
+                    <input id="firstname" class="form-control" name="firstname" value="<%=data[0].firstname%>" readonly>
+                </div>
+                <div class="form-group col-md-5">
+                    <label for="lastname">นามสกุล</label>
+                    <input id="lastname" class="form-control" name="lastname" value="<%=data[0].lastname%>" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="gender">เพศ</label>
+                    <select id="gender" class="form-control" name="gender" disabled>
+                        <option value="Male" id="male">Male</option>
+                        <option value="Female" id="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="birth_date">วันเกิด</label>
+                    <input id="birth_date" class="form-control" name="birth_date" value="<%=data[0].birth_date%>" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="iden_id">เลขบัตรประจำตัวประชาชน</label>
+                    <input id="iden_id" class="form-control" name="iden_id" value="<%=data[0].iden_id%>" readonly>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="contact_number">หมายเลขติดต่อ</label>
+                    <input id="contact_number" class="form-control" name="contact_number" value="<%=data[0].contact_number%>" readonly>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="add_contact">หมายเลขติดต่อเพิ่มเติม</label>
+                    <input id="add_contact" class="form-control" name="add_contact" value="<%=data[0].add_contact_number%>" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="medical_conditions">ข้อมูลโรคประจำตัว, อาการแพ้ยา และอื่นๆ</label>
+                <input id="medical_conditions" class="form-control" name="medical_conditions" value="<%=data[0].medical_conditions%>" readonly>
+            </div>
+            
+            <input class="btn btn-secondary" onclick="toggleEdit()" type="button" value="Edit">
+            <input class="btn btn-success" type="submit" value="Save">
+        </form>
+    </div>
     
     <%-include("main-content-bottom")%>
     <%-include("script-toggle-sidebar")%>
