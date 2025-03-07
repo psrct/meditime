@@ -1064,7 +1064,6 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
       if (tasks_err) throw tasks_err;
       db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
         if (subtasks_err) throw subtasks_err;
-        console.log(subtasks_rows);
         res.render('schedule', { tasks_data: tasks_rows,
                                 subtasks_data: subtasks_rows,
                                 search_date: req.params.date

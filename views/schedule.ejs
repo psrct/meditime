@@ -7,6 +7,10 @@
         background-color: #f4f4f4;
     }
 
+    hr {
+        border-top: 2px solid rgba(0, 0, 0, 0.323);
+    }
+
     .calendar {
         width: 550px;
         background: white;
@@ -30,30 +34,49 @@
         font-weight: bold;
         background: #bbb;
     }
+
     .day.today {
         background: #ff6347;
         color: white;
         font-weight: bold;
+    }
+
+    .task-container {
+        width: 600px;
+        margin-left: 75px
+    }
+
+    .task {
+        width: 550px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
     }
 </style>
 <body>
     <%-include("sidebar")%>
     <%-include("main-content-top")%>
     <input id="date_input" type="date" onchange="changeDate()"><br>
-    <div class="calendar">
-        <div style="display:flex; align-items:center; justify-content:center;">
-            <button id="prev-month" class="nav-button" style="border:none; font-size:25px; position:absolute; left:325px"><</button>
-            <h2 id="month-year"></h2>
-            <button id="next-month" class="nav-button" style="border:none; font-size:25px; position:absolute; left:790px">></button>
+    <div style="display: flex;">
+        <div class="calendar">
+            <div style="display:flex; align-items:center; justify-content:center;">
+                <button id="prev-month" class="nav-button" style="border:none; font-size:25px; position:absolute; left:325px"><</button>
+                <h2 id="month-year"></h2>
+                <button id="next-month" class="nav-button" style="border:none; font-size:25px; position:absolute; left:790px">></button>
+            </div>
+            <div class="grid" id="calendar-days">
+                <div class="weekday">Sun</div>
+                <div class="weekday">Mon</div>
+                <div class="weekday">Tue</div>
+                <div class="weekday">Wed</div>
+                <div class="weekday">Thu</div>
+                <div class="weekday">Fri</div>
+                <div class="weekday">Sat</div>
+            </div>
         </div>
-        <div class="grid" id="calendar-days">
-            <div class="weekday">Sun</div>
-            <div class="weekday">Mon</div>
-            <div class="weekday">Tue</div>
-            <div class="weekday">Wed</div>
-            <div class="weekday">Thu</div>
-            <div class="weekday">Fri</div>
-            <div class="weekday">Sat</div>
+        <div class="task-container" id="task-container">
         </div>
     </div>
     <%-include("main-content-bottom")%>
@@ -100,6 +123,67 @@
         }
         
         document.getElementById("calendar-days").innerHTML = daysHTML;
+
+
+
+        const tasks_data = <%-JSON.stringify(tasks_data)%>;
+        const subtasks_data = <%-JSON.stringify(subtasks_data)%>;
+
+
+        function createTaskBar(task) {
+            const temTaskDiv = document.createElement("div");
+            temTaskDiv.className = "task";
+            temTaskDiv.id = `task-${task.task_id}`;
+
+            const task_id = document.createElement("p");
+            const start_datetime = document.createElement("p");
+            const end_datetime = document.createElement("p");
+            const is_paid = document.createElement("p");
+            const is_completed = document.createElement("p");
+            const subtaskServiceList = document.createElement("p");
+
+            task_id.innerHTML = `${task.task_id}`;
+            start_datetime.innerHTML = `${task.start_datetime}`;
+            end_datetime.innerHTML = `${task.end_datetime}`;
+            is_paid.innerHTML = `${task.is_paid}`;
+            is_completed.innerHTML = `${task.is_completed}`;
+
+
+            const allSubtasks = subtasks_data.filter(subtask => subtask.task_id == task.task_id);
+            allSubtasks.forEach(subtask => {
+                console.log(allSubtasks)
+                subtaskServiceList.innerHTML += `${subtask.service_name} ${subtask.start_datetime} - ${subtask.end_datetime}<br>`;
+            });
+
+            temTaskDiv.appendChild(task_id);
+            temTaskDiv.appendChild(start_datetime);
+            temTaskDiv.appendChild(end_datetime);
+            temTaskDiv.appendChild(is_paid);
+            temTaskDiv.appendChild(is_completed);
+            temTaskDiv.appendChild(document.createElement("hr"));
+            temTaskDiv.appendChild(subtaskServiceList);
+
+            return temTaskDiv;
+        }
+
+        function createSubtaskBar() {
+            const task_id = document.createElement("p");
+            const start_datetime = document.createElement("p");
+            const end_datetime = document.createElement("p");
+            const is_paid = document.createElement("p");
+            const is_completed = document.createElement("p");
+        }
+
+        
+
+        function showTasks() {
+            const task_container = document.getElementById("task-container");
+
+            tasks_data.forEach(task => {
+                task_container.appendChild(createTaskBar(task));
+            });
+        }
+        showTasks();
     </script>
 </body>
 
