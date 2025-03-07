@@ -3,7 +3,7 @@
   <body>
     <%-include("sidebar")%>
     <%-include("main-content-top")%>
-    <input type="text" id="search-bar" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ...">
+    <input type="text" id="search-bar" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ..." oninput="">
     <h1>Table Of Task</h1>
     <table>
       <thead>
@@ -42,6 +42,14 @@
     <%-include("script-toggle-sidebar")%>
     <script>
 
+      <% if (user.usertype == "patient") { %>
+        const tasks_data = <%-JSON.stringify(tasks_data)%>;
+      <% } %>
+      const subtasks_data = <%-JSON.stringify(subtasks_data)%>;
+
+      function tasks_filter() {
+
+      }
     </script>
   </body>
 

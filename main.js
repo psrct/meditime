@@ -233,22 +233,13 @@ app.get('/history', checkLoggedIn, function (req, res) {
   } else if (req.session.user.usertype == "doctor") {
     const subtask_query = ` SELECT * FROM Subtasks\
                           WHERE doctor_id = ${req.session.user.id}; `;
-    db.all(task_query, (err, tasks_rows) => {
+    db.all(subtask_query, (err, subtasks_rows) => {
       if (err) {
         console.log(err.message);
       }
-      console.log(tasks_rows);
+      console.log(subtasks_rows);
 
-      db.all(subtask_query, (err, subtasks_rows) => {
-        if (err) {
-          console.log(err.message);
-        }
-        console.log(subtasks_rows);
-
-        res.render('data', { tasks_data: tasks_rows,
-                              subtasks_data: subtasks_rows
-         });
-      });
+      res.render('data', { subtasks_data: subtasks_rows });
     });
   }
 });
@@ -1074,10 +1065,12 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
     return res.redirect("/schedule");
   }
 
-  const tasks_sql = ` SELECT * FROM Tasks\
-                      WHERE DATE(start_datetime) = "${req.params.date}" `
-
   const id = req.session.user.id;
+
+  const tasks_sql = ` SELECT * FROM Tasks\
+                      WHERE DATE(start_datetime) = "${req.params.date}" \
+                      AND ${req.session.user.usertype}_id = ${id}; `
+
   if (req.session.user.usertype == "patient") {
     const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.doctor_id AS 'doctor_id', CONCAT(d.prename + " " + d.firstname + " " + d.lastname) AS 'doctor_name', s.name AS 'Specialty', \
                           st.room_id AS 'room_id', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
@@ -1097,6 +1090,7 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
 
     db.all(tasks_sql, (tasks_err, tasks_rows) => {
       if (tasks_err) throw tasks_err;
+      console.log(tasks_rows)
       db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
         if (subtasks_err) throw subtasks_err;
         res.render('schedule', { tasks_data: tasks_rows,
