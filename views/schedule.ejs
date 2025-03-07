@@ -153,8 +153,10 @@
         document.getElementById("calendar-days").innerHTML = daysHTML;
 
 
-
-        const tasks_data = <%-JSON.stringify(tasks_data)%>;
+        <% if(user.usertype == "patient"){ %>
+            const tasks_data = <%-JSON.stringify(tasks_data)%>;
+        <% } %>
+        
         const subtasks_data = <%-JSON.stringify(subtasks_data)%>;
         
 
@@ -175,14 +177,14 @@
             start_datetime.innerHTML = `วัน/เวลาที่เริ่ม : ${task.start_datetime}`;
             end_datetime.innerHTML = `วัน/เวลาที่เสร็จสิ้น : ${task.end_datetime}`;
             if(task.is_paid==="No"){
-                is_paid.innerHTML = `การชำระเงิน : ยังไม่ได้ชำระเงิน`;
+                is_paid.innerHTML = `การชำระเงิน : ❌`;
             }else{
-                is_paid.innerHTML = `การชำระเงิน : ชำระเงินแล้ว`;
+                is_paid.innerHTML = `การชำระเงิน : ✅`;
             }
             if(task.is_completed==="No"){
-                is_completed.innerHTML = `สถานะ : ยังไม่เสร็จสิ้น`;
+                is_completed.innerHTML = `สถานะ : ❌`;
             }else{
-                is_completed.innerHTML = `สถานะ : เสร็จสิ้น`;
+                is_completed.innerHTML = `สถานะ : ✅`;
             }
 
 
