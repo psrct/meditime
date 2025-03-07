@@ -16,33 +16,79 @@
 
 </style>
 <body>
-    <%-include("sidebar-owner")%>
-    <%-include("main-content-top")%>
-    <form action="/edit-staff/<%=data[0].doctor_id%>" method="post">
-        <input id="username" class="txtbox" name="username" value="<%=data[0].username%>" readonly><br><br>
-        <input id="password" class="txtbox" name="password" value="<%=data[0].password%>" readonly><br><br>
-        <input id="prename" class="nochange" name="prename" value="<%=data[0].prename%>" readonly><br><br>
-
-        <input id="firstname" class="txtbox" name="firstname" value="<%=data[0].firstname%>" readonly><br><br>
-        <input id="lastname" class="txtbox" name="lastname" value="<%=data[0].lastname%>" readonly><br><br>
-        <input id="contact_number" class="txtbox" name="contact_number" value="<%=data[0].contact_number%>" readonly><br><br>
-        <input type="date" id="retire_date" class="txtbox" name="retire_date" value="<%=data[0].retire_date%>" readonly><br><br>
-
-        <select id="gender" class="option" name="gender" disabled>
-            <option value="Male" id="male">Male</option>
-            <option value="Female" id="female">Female</option>
-        </select>
-        <select class="option" name="specialty_id" id="specialty_list" disabled>
-            <% specialtyinfo.forEach((item) => { %>
-                <option value="<%= item.specialty_id %>" id="<%=item.specialty_id%>"><%= item.name %></option>
-            <% }) %>
-        </select>
-        <input onclick="toggleEdit()" type="button" value="Edit">
-        <input type="submit" value="Save">
-    </form>
-    
-    <%-include("main-content-bottom")%>
-    <%-include("script-toggle-sidebar")%>
+    <div class="d-flex">
+        <div class="main">
+        <nav class="navbar navbar-expand border-bottom">
+            <a href="/manage-staff">
+                <button class="toggler-btn" type="button">
+                    <i class="lni lni-chevron-left"></i>
+                </button>
+            </a>
+        </nav>
+        <main class="p-3">
+            <div class="container-fluid">
+                <div class="container">
+                    <form action="/edit-staff/<%=data[0].doctor_id%>" method="post">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="username">ชื่อผู้ใช้</label>
+                            <input class="form-control" id="username"  name="username" value="<%=data[0].username%>" readonly><br><br>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="password">รหัสผ่าน</label>
+                            <input class="form-control" id="password"  name="password" value="<%=data[0].password%>" readonly><br><br>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="prename">คำนำหน้า</label>
+                            <input class="form-control" id="prename" class="nochange" name="prename" value="<%=data[0].prename%>" readonly><br><br>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label for="firstname">ชื่อจริง</label>
+                            <input class="form-control" id="firstname"  name="firstname" value="<%=data[0].firstname%>" readonly><br><br>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label for="lastname">นามสกุล</label>
+                            <input class="form-control" id="lastname"  name="lastname" value="<%=data[0].lastname%>" readonly><br><br>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="contact_number">เพศ</label>
+                            <select class="form-control" id="gender" class="option" name="gender" disabled>
+                                <option value="Male" id="male">Male</option>
+                                <option value="Female" id="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="specialty_list">สาขาเชี่ยวชาญ</label>
+                            <select class="form-control" class="option" name="specialty_id" id="specialty_list" disabled>
+                                <% specialtyinfo.forEach((item) => { %>
+                                    <option value="<%= item.specialty_id %>" id="<%=item.specialty_id%>"><%= item.name %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="contact_number">หมายเลขติดต่อ</label>
+                            <input class="form-control" id="contact_number"  name="contact_number" value="<%=data[0].contact_number%>" readonly><br><br>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="contact_number">วันที่เลิกจ้าง</label>
+                            <input class="form-control" type="date" id="retire_date"  name="retire_date" value="<%=data[0].retire_date%>" readonly><br><br>
+                        </div>
+                    </div>
+                
+                    <input class="btn btn-secondary" onclick="toggleEdit()" type="button" value="Edit">
+                    <input class="btn btn-success" type="submit" value="Save">
+                    </form>
+                 </div>
+            </div>
+        </main>
+        </div>
+    </div>
     <%-include("script-toggle-edit")%>
     <script>
         var gender = "<%=data[0].gender%>";

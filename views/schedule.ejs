@@ -56,7 +56,11 @@
     }
 </style>
 <body>
-    <%-include("sidebar")%>
+    <% if(user.usertype == "doctor"){ %>
+        <%-include("sidebar-doctor")%>
+    <% } else { %>
+        <%-include("sidebar")%>
+    <% } %>
     <%-include("main-content-top")%>
     <input id="date_input" type="date" onchange="changeDate()"><br>
     <div style="display: flex;">
@@ -83,9 +87,9 @@
     <%-include("script-toggle-sidebar")%>
 
     <script>
+        <%-include('scripts/DateFormat')%>
         document.getElementById("logo").removeAttribute("src");
         document.getElementById("logo").setAttribute("src", "../logo.png");
-        <%-include('scripts/DateFormat')%>
 
         function changeCustomDate(datestring) {
             window.location.href = `/schedule/${datestring}`;
