@@ -66,7 +66,7 @@ app.post('/login-staff', function(req, res){
     username: req.body.username,
     password: req.body.password
   }
-  const sql = `select * from Doctors where username = "${loginData.username}" `;
+  const sql = ` select * from Doctors where username = "${loginData.username}" and retire_date is null; `;
   db.all(sql, function(err, rows){
     console.log(rows);
     if(rows.length < 1){
