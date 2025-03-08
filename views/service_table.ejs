@@ -1,5 +1,9 @@
 <%-include("head")%>
     <style>
+        nav {
+            background: #999074;
+        }
+
         .circle {
             margin-right: 10px;
             width: 15px;
@@ -68,11 +72,12 @@
                 grid-template-columns: 1fr;
             }
         }
-        .grid-item{
+
+        .grid-item {
             border-radius: 10px;
         }
 
-        .dropshadow{
+        .dropshadow {
             box-shadow: 1px 1px 10px rgba(0, 0, 0, .2);
             /* filter: drop-shadow(1px 1px 20px black); */
         }
@@ -85,14 +90,17 @@
                 <div class="grid mx-5">
                     <% data.forEach((item)=> { %>
                         <div class="grid-item border p-3 dropshadow">
-                            <p>ชื่อบริการ : <%= item.service_name%></p>
-                            <p>ประเภท: <%= item.category_name%></p>
+                            <p>ชื่อบริการ : <%= item.service_name%>
+                            </p>
+                            <p>ประเภท: <%= item.category_name%>
+                            </p>
                             <p>ราคา : <%= item.price%> บาท</p>
                             <p>ระยะเวลา : <% if (item.duration>= 60) { %>
                                     <%=( Math.floor( item.duration / 60) )%> ชั่วโมง
                                         <% } %>
                                             <%=( Math.floor( item.duration % 60) )%> นาที</p>
-                            <p>จองได้ด้วยตนเอง : <%=(item.only_doctor == "Yes") ? "❌" : "✅"%></p>
+                            <p>จองได้ด้วยตนเอง : <%=(item.only_doctor=="Yes" ) ? "❌" : "✅" %>
+                            </p>
                             <div class="flex">
                                 <% if (item.status==='Active' ) { %>
                                     <div class="circle2"></div> เปิดให้บริการ
@@ -104,7 +112,7 @@
                         <% }) %>
                 </div>
                 <%-include("main-content-bottom")%>
-                <%-include("script-toggle-sidebar")%>
+                    <%-include("script-toggle-sidebar")%>
     </body>
 
     </html>
