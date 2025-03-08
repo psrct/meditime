@@ -1,7 +1,11 @@
 <%- include("head") %>
 
   <body>
-    <%-include("sidebar")%>
+    <% if(user.usertype == "patient"){ %>
+      <%-include("sidebar")%>
+    <% }else { %>
+        <%-include("sidebar-owner")%>
+    <% } %>
       <%-include("main-content-top")%>
         <div class="container mt-4">
           <input type="text" id="search-bar" class="form-control mb-3" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ..."
