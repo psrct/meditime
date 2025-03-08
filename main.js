@@ -500,7 +500,23 @@ app.get('/deleteservice/:id', checkLoggedIn, isOwner, (req, res) => {
 });
 
 app.get('/records',checkLoggedIn, isOwner, function (req, res) {
-  const query = 'SELECT * FROM Subtasks;';
+  const query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', p.prename || " " || p.firstname || " " || p.lastname AS 'patient_name', \
+                st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name', \
+                d.prename || " " || d.firstname || " " || d.lastname AS 'doctor_name', DATE(st.start_datetime) AS 'date' FROM Subtasks st\
+                \
+                JOIN Tasks t\
+                USING (task_id)\
+                JOIN Services sv\
+                USING (service_id)\
+                JOIN Service_categories sc\
+                USING (category_id)\
+                JOIN Patients p\
+                USING (patient_id)\
+                JOIN Rooms r\
+                USING (room_id)\
+                JOIN Doctors d\
+                USING (doctor_id)\
+                ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -544,7 +560,7 @@ app.get('/doctor_history', checkLoggedIn, isDoctor, function (req, res) {
   const query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', p.prename || " " || p.firstname || " " || p.lastname AS 'patient_name', \
                 st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
                 \
-                JOIN (SELECT * FROM Tasks)\
+                JOIN Tasks t\
                 USING (task_id)\
                 JOIN Services sv\
                 USING (service_id)\
@@ -555,7 +571,7 @@ app.get('/doctor_history', checkLoggedIn, isDoctor, function (req, res) {
                 JOIN Rooms r\
                 USING (room_id)\
                 WHERE doctor_id = ${req.session.user.id}\
-                ORDER BY DATETIME(st.start_datetime) ASC; `
+                ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `
   db.all(query, (err, rows) => {
     if (err) {
       console.log(err.message);
@@ -1130,7 +1146,7 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
         const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.doctor_id AS 'doctor_id', d.prename || " " || d.firstname || " " || d.lastname AS 'doctor_name', s.name AS 'Specialty', \
                               st.room_id AS 'room_id', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
                               \
-                              JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}")\
+                              JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}") t\
                               USING (task_id)\
                               JOIN Services sv\
                               USING (service_id)\
@@ -1141,7 +1157,7 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
                               JOIN Specialties s\
                               USING (specialty_id)
                               WHERE patient_id = ${id}\
-                              ORDER BY DATETIME(st.start_datetime) ASC; `
+                              ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `
 
         db.all(tasks_sql, (tasks_err, tasks_rows) => {
           if (tasks_err) throw tasks_err;
@@ -1158,7 +1174,7 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
         const subtasks_sql = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', p.prename || " " || p.firstname || " " || p.lastname AS 'patient_name', \
                               st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
                               \
-                              JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}")\
+                              JOIN (SELECT * FROM Tasks WHERE DATE(start_datetime) = "${req.params.date}") t\
                               USING (task_id)\
                               JOIN Services sv\
                               USING (service_id)\
@@ -1169,7 +1185,7 @@ app.get('/schedule/:date', checkLoggedIn, function (req, res) {
                               JOIN Rooms r\
                               USING (room_id)\
                               WHERE doctor_id = ${id}\
-                              ORDER BY DATETIME(st.start_datetime) ASC; `
+                              ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `;
 
         db.all(subtasks_sql, (subtasks_err, subtasks_rows) => {
           if (subtasks_err) throw subtasks_err;

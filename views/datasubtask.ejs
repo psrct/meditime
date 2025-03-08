@@ -7,7 +7,31 @@
             <%-include("sidebar-owner")%>
         <% } %>
             <%-include("main-content-top")%>
+
                 <div class="container mt-4">
+                    <div style="display:flex">
+                        <div class="col-sm-3">
+                            <a>ชื่อบริการ : </a>
+                            <input type="text" id="service-search-bar" class="form-control mb-3" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ..."
+                            oninput="tasks_filter()">
+                        </div>
+                        <div class="col-sm-3">
+                            <a>ชื่อผู้ป่วย : </a>
+                            <input type="text" id="patient-search-bar" class="form-control mb-3" placeholder="ใส่ชื่อผู้ป่วยเพื่อค้นหาประวัติ..."
+                            oninput="tasks_filter()">
+                        </div>
+                        <div class="col-sm-3">
+                            <a>ชื่อหมอ : </a>
+                            <input type="text" id="doctor-search-bar" class="form-control mb-3" placeholder="ใส่ชื่อหมอเพื่อค้นหาประวัติ..."
+                            oninput="tasks_filter()">
+                        </div>
+                        <div class="col-sm-3">
+                            <a>วัน/เดือน/ปี : </a>
+                            <input type="date" id="date-search-bar" class="form-control mb-3"
+                            oninput="tasks_filter()">
+                        </div>
+                    </div>
+
                     <h1 class="mb-3">ประวัติการรักษา</h1>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
@@ -16,40 +40,89 @@
                                     <th>รหัส</th>
                                     <th>ห้อง</th>
                                     <th>ชื่อผู้ป่วย</th>
+                                    <th>ชื่อหมอ</th>
                                     <th>ชื่อบริการ</th>
                                     <th>วัน/เวลาที่เรื่ม</th>
                                     <th>วัน/เวลาที่เสร็จสิ้น</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <% data.forEach((item)=> { %>
-                                    <tr>
-                                        <td>
-                                            <%= item.task_id %>-<%= item.subtask_no %>
-                                        </td>
-                                        <td>
-                                            <%= item.room_name %> (<%= item.room_id %>)
-                                        </td>
-                                        <td>
-                                            <%= item.patient_name %>
-                                        </td>
-                                        <td>
-                                            <%= item.service_name %> (<%= item.service_id %>)
-                                        </td>
-                                        <td>
-                                            <%= item.start_datetime %>
-                                        </td>
-                                        <td>
-                                            <%= item.end_datetime %>
-                                        </td>
-                                    </tr>
-                                    <% }) %>
+                            <tbody id="tbody">
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <%-include("main-content-bottom")%>
-                    <%-include("script-toggle-sidebar")%>
+                <%-include("script-toggle-sidebar")%>
+        <script>
+            const tasks_data = <%-JSON.stringify(data)%>;
+            let filter_tasks_data = tasks_data;
+
+            const tbody = document.getElementById("tbody");
+
+            const service_search_bar = document.getElementById("service-search-bar");
+            const patient_search_bar = document.getElementById("patient-search-bar");
+            const doctor_search_bar = document.getElementById("doctor-search-bar");
+            const date_search_bar = document.getElementById("date-search-bar");
+
+            function showTasks() {
+                tbody.innerHTML = "";
+
+                filter_tasks_data.forEach(item => {
+                    const temTr = document.createElement("tr");
+
+                    const temTaskID = document.createElement("td");
+                    temTaskID.innerHTML = `${item.task_id}-${item.subtask_no}`;
+
+                    const temRoom = document.createElement("td");
+                    temRoom.innerHTML = `${item.room_name} (${item.room_id})`;
+
+                    const temPatient = document.createElement("td");
+                    temPatient.innerHTML = `${item.patient_name}`;
+
+                    const temDoctor = document.createElement("td");
+                    temDoctor.innerHTML = `${item.doctor_name}`;
+
+                    const temService = document.createElement("td");
+                    temService.innerHTML = `${item.service_name} (${item.service_id})`;
+
+                    const temStart = document.createElement("td");
+                    temStart.innerHTML = `${item.start_datetime}`;
+
+                    const temEnd = document.createElement("td");
+                    temEnd.innerHTML = `${item.end_datetime}`;
+
+                    temTr.appendChild(temTaskID);
+                    temTr.appendChild(temRoom);
+                    temTr.appendChild(temPatient);
+                    temTr.appendChild(temDoctor);
+                    temTr.appendChild(temService);
+                    temTr.appendChild(temStart);
+                    temTr.appendChild(temEnd);
+
+                    tbody.appendChild(temTr);
+                })
+            }
+
+            function tasks_filter() {
+                filter_tasks_data = tasks_data;
+
+                if (service_search_bar.value != "") {
+                    filter_tasks_data = tasks_data.filter(task => task.service_name.includes(service_search_bar.value) && filter_tasks_data.includes(task));
+                }
+                if (patient_search_bar.value != "") {
+                    filter_tasks_data = tasks_data.filter(task => task.patient_name.includes(patient_search_bar.value) && filter_tasks_data.includes(task));
+                }
+                if (doctor_search_bar.value != "") {
+                    filter_tasks_data = tasks_data.filter(task => task.doctor_name.includes(doctor_search_bar.value) && filter_tasks_data.includes(task));
+                }
+                if (date_search_bar.value != "") {
+                    filter_tasks_data = tasks_data.filter(task => task.date.includes(date_search_bar.value) && filter_tasks_data.includes(task));
+                }
+                showTasks();
+                
+            }
+            tasks_filter();
+        </script>
     </body>
 
     </html>
