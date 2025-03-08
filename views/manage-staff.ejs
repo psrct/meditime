@@ -1,4 +1,31 @@
 <%-include("head")%>
+<script>
+    function deletestaff(id) {
+        Swal.fire({
+            title: "คุณแน่ใจหรือไม่?",
+            text: "เมื่อลบแล้วจะไม่สามารถกู้คืนได้!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "ใช่, ลบเลย!",
+            cancelButtonText: "ยกเลิก"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/remove-staff/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire("ลบสำเร็จ!", data.message, "success")
+                                .then(() => location.reload()); // รีโหลดหน้า
+                        } else {
+                            Swal.fire("เกิดข้อผิดพลาด!", data.message, "error");
+                        }
+                    });
+            }
+        });
+    }
+</script>
 <style>
     .manage-icon i{
         color: rgb(47, 46, 46);
@@ -23,21 +50,21 @@
     <%-include("main-content-top")%>
     <div class="container">
         <h1>รายชื่อแพทย์</h1>
-        <a href="/add-staff %>" class="btn btn-primary">เพิ่มข้อมูลแพทย์</a><br><br>
+        <a href="/add-staff %>" class="btn btn-primary my-1">เพิ่มข้อมูลแพทย์</a><br><br>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>ชื่อ</th>
                     <!-- <th>prename</th>
                     <th>firstname</th>
                     <th>lastname</th> -->   
-                    <th>Hire Date</th>
-                    <th>Retire Date</th>
-                    <th>Contact Number</th>
-                    <th>Specialty</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Action</th>
+                    <th>วันที่เข้าทำงาน</th>
+                    <th>วันที่ออกจากงาน</th>
+                    <th>เบอร์โทรศัพท์</th>
+                    <th>ความเชี่ยวชาญ</th>
+                    <th>ชื่อผู้ใช้</th>
+                    <th>รหัสผ่าน</th>
+                    <th>แก้ไขข้อมูล</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,7 +82,7 @@
                         <td>
                             <p>
                                 <a href="/edit-staff/<%= item.doctor_id %>" class="manage-icon"><i class="lni lni-pencil-1" id="edit">&nbsp</i></a>
-                                <a href="/remove-staff/<%= item.doctor_id %>" class="manage-icon"><i class="lni lni-trash-3" id="bin"></i></a>
+                                <a onclick="deletestaff('<%= item.doctor_id %>')" class="manage-icon"><i class="lni lni-trash-3" id="bin"></i></a>
                             </p>
                         </td>
                     

@@ -1,12 +1,7 @@
 <%-include("head")%>
     <style>
-        .main {
-            width: 80%;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        nav {
+            background: #999074;
         }
 
         .main-header {
@@ -28,7 +23,8 @@
             color: #030303;
         }
 
-        .services ul, li {
+        .services ul,
+        li {
             list-style: circle;
             margin: 0;
             padding: 0;
@@ -47,38 +43,38 @@
 
     <body>
         <%-include("sidebar")%>
-            <main class="main">
-                <header class="main-header">
-                    <h1>ยินดีต้อนรับสู่ Meditime Clinic</h1>
-                    <p>ดูแลสุขภาพของคุณ ด้วยทีมแพทย์ผู้เชี่ยวชาญ</p>
-                </header>
+            <%-include("main-content-top")%>
+                <main class="main">
+                    <header class="main-header">
+                        <h1>ยินดีต้อนรับสู่ Meditime Clinic</h1>
+                        <p>ดูแลสุขภาพของคุณ ด้วยทีมแพทย์ผู้เชี่ยวชาญ</p>
+                    </header>
 
-                <section id="about" class="section">
-                    <h2>เกี่ยวกับเรา</h2>
-                    <p>Meditime Clinic เป็นคลินิกที่มุ่งเน้นการดูแลสุขภาพแบบครบวงจร
-                        โดยทีมแพทย์และบุคลากรที่มีประสบการณ์สูง</p>
+                    <section id="about" class="section">
+                        <h2>เกี่ยวกับเรา</h2>
+                        <p>Meditime Clinic เป็นคลินิกที่มุ่งเน้นการดูแลสุขภาพแบบครบวงจร
+                            โดยทีมแพทย์และบุคลากรที่มีประสบการณ์สูง</p>
                         <img src="Meditime_pic.webp" alt="Meditime Clinic" style="width: 100%; border-radius: 5px;">
-                </section>
+                    </section>
 
-                <section id="services" class="section">
-                    <h2>บริการของเรา</h2>
-                    <ul>
-                        <li>ตรวจสุขภาพทั่วไป</li>
-                        <li>รักษาโรคทั่วไป</li>
-                        <li>ให้คำปรึกษาด้านสุขภาพ</li>
-                        <li>กายภาพบำบัดและฟื้นฟูสุขภาพ</li>
-                    </ul>
-                </section>
+                    <section id="services" class="section">
+                        <h2>บริการของเรา</h2>
+                        <ul>
+                            <li>ตรวจสุขภาพทั่วไป</li>
+                            <li>รักษาโรคทั่วไป</li>
+                            <li>ให้คำปรึกษาด้านสุขภาพ</li>
+                            <li>กายภาพบำบัดและฟื้นฟูสุขภาพ</li>
+                        </ul>
+                    </section>
 
-                <section id="contact" class="section">
-                    <h2>ติดต่อเรา</h2>
-                    <p>ที่อยู่: 123 ถนนสุขภาพดี เขตสุขภาพ กรุงเทพฯ 10110</p>
-                    <p>โทร: 02-123-4567</p>
-                    <p>อีเมล: contact@meditimeclinic.com</p>
-                </section>
-            </main>
-
-            <%-include("script-toggle-sidebar")%>
+                    <section id="contact" class="section">
+                        <h2>ติดต่อเรา</h2>
+                        <p>ที่อยู่: 123 ถนนสุขภาพดี เขตสุขภาพ กรุงเทพฯ 10110</p>
+                        <p>โทร: 02-123-4567</p>
+                        <p>อีเมล: contact@meditimeclinic.com</p>
+                    </section>
+                </main>
+                <%-include("script-toggle-sidebar")%>
     </body>
 
     </html>
