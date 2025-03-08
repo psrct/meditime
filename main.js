@@ -167,7 +167,7 @@ app.get('/home', function (req, res) {
 
   db.all(sql, [], (err, rows) => {
       if (err) throw err;
-      res.render('service_table', { data: rows });
+      res.render('home', { data: rows });
       res.end();
   });
 });
