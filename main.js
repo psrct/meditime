@@ -359,10 +359,11 @@ app.post('/add-staff', checkLoggedIn, isOwner, function(req, res){
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         gender: req.body.gender,
-        specialty_id: req.body.specialty
+        specialty_id: req.body.specialty,
+        contact: req.body.contact
         };
         console.log(registerData);  
-        const sql = `insert into Doctors(prename, firstname, lastname, hire_date, retire_date, specialty_id, gender, username, password) 
+        const sql = `insert into Doctors(prename, firstname, lastname, hire_date, retire_date, specialty_id, gender, username, password, contact_number) 
         values("${registerData.prename}",
         "${registerData.firstname}",
         "${registerData.lastname}",
@@ -371,7 +372,8 @@ app.post('/add-staff', checkLoggedIn, isOwner, function(req, res){
         ${registerData.specialty_id},
         "${registerData.gender}",
         "${registerData.username}",
-        "${registerData.password}")`;
+        "${registerData.password}",
+        "${registerData.contact}")`;
         db.run(sql, function(err){
         if (err) throw err;
         console.log("Add user successfully.");
@@ -583,17 +585,11 @@ function DateToTimeString(date) {
 }
 
 function feedback(message) {
-  return `<div style="position:absolute; text-align:center; width:100%; height=10000px; background-color:white;" id="alert-window">\
-      <a style="font-size:3vw; font-weight:bold;">${message}<br>\
-      <button onclick="document.getElementById('alert-window').remove(); document.getElementById('for-alert').style.visibility = 'hidden';" style="font-size:1.5vw; color:white; background-color: rgb(50, 159, 50);\
-       border:none; padding-left:1%; padding-right:1%; padding-top:0.5%; padding-bottom:0.5%; border-radius:7.5%; cursor:pointer;">Back</button><a></div>`;
+  return `${message}`;
 }
 
-function queueSuccess() {
-  return `<div style="position:absolute; text-align:center; width:100%; height=10000px; background-color:white;" id="alert-window">\
-      <a style="font-size:3vw; font-weight:bold;">คิวของคุณถูกบันทึกลงในระบบแล้ว<br>สามารถตรวจสอบได้ในการนัดหมาย<br>\
-      <button onclick="location.reload();" style="font-size:1.5vw; color:white; background-color: rgb(50, 159, 50);\
-       border:none; padding-left:1%; padding-right:1%; padding-top:0.5%; padding-bottom:0.5%; border-radius:7.5%; cursor:pointer;">Back</button><a></div>`;
+function queueSuccess(req,res) {
+  return `คิวของคุณถูกบันทึกลงในระบบแล้ว<br>สามารถตรวจสอบได้ในการนัดหมาย`;
 }
 
 

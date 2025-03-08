@@ -7,13 +7,13 @@
         <a id="queue_count" style="font-size:2vw; font-weight:bold;">จำนวนคิวและนัดทั้งหมดของโรงพยาบาลในวันนี้: -</a><br><br>
         <div class="form-group row">
             <label for="date_input" class="col-sm-2 col-form-label">วันที่ต้องการจองคิว : </label>
-            <div class="col-sm-5">
+            <div class="col-sm-3">
                 <input name="date_input" class="form-control" id="date_input" type="date" onchange="changeDate()"><br>
             </div>
         </div>
         <div class="form-group row">
-            <label for="doctor_selected" class="col-sm-2 col-form-label">หมอ : </label>
-            <div class="col-sm-5">
+            <label for="doctor_selected" class="col-sm-2 col-form-label">แพทย์ : </label>
+            <div class="col-sm-3">
                 <input name="doctor_selected" class="form-control" list="doctors_data" id="doctor_selected" type="text" oninput="doctors_filter();updateTasksAndServices();canService();updateDuration();updateAllPrice();updateClockData();"><br>
             </div>
         </div>
@@ -25,7 +25,7 @@
         <div id="queue-below-container">
                 <div class="form-group row">
                     <label for="start_time_input" class="col-sm-2 col-form-label">เวลาที่ต้องการจองคิว :</label>
-                    <div class="col-sm-5">
+                    <div class="col-sm-2">
                         <input name="start_time_input" class="form-control" id="start_time_input" type="time" oninput="updateDuration();updateClockData();">
                     </div>
                 </div>
@@ -43,12 +43,10 @@
             <br>
             <div class="form-group row">
                 <label for="all-price-count" class="col-sm-2 col-form-label">ราคารวมบริการทั้งหมด : </label>
-                <div class="col-sm-5">
+                <div class="col-sm-2">
                     <input class="form-control" name="all-price-count" type="text" id="all-price-count" placeholder="0 บาท" disabled>
                 </div>
             </div>
-            
-            <br><br><br>
             <button class="btn btn-success" type="button" id="queue_button" onclick="queue()">จองคิว</button>
             <a href="/"><button class="btn btn-danger" type="button" id="cancel_button">ยกเลิก</button></a>
         </div>
@@ -320,7 +318,7 @@
         }
 
         function findQueueCount() {
-            document.getElementById("queue_count").innerHTML = "จำนวนคิวและนัดทั้งหมดของโรงพยาบาลในวันนี้: " + <%= tasks_data.length %>;
+            document.getElementById("queue_count").innerHTML = "จำนวนคิวและนัดทั้งหมดของโรงพยาบาลในวันนี้ : " + +<%= tasks_data.length %>;
         }
         findQueueCount();
 
@@ -361,11 +359,27 @@
             })
             .then(response => response.text())
             .then(data => {
-                document.getElementById("for-alert").innerHTML = data;
-                document.getElementById("for-alert").style.visibility = "visible";
+                Swal.fire({
+                    title: data,
+                    icon: "warning",
+                    showCancelButton: true,
+                    showConfirmButton: false,
+                    cancelButtonColor: "#3085d6",
+                    cancelButtonText: "ปิด"
+                }).then(() => {
+                    if(data === "คิวของคุณถูกบันทึกลงในระบบแล้ว<br>สามารถตรวจสอบได้ในการนัดหมาย"){
+                         window.location.href = "/home"
+                    }
+                });
             })
             .catch((error) => {
                 console.error('Error:', error);
+                Swal.fire({
+                    title: "เกิดข้อผิดพลาด!",
+                    text: "ไม่สามารถดำเนินการได้ กรุณาลองใหม่",
+                    icon: "error",
+                    confirmButtonText: "ตกลง"
+                });
             });
         }
 

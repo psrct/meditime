@@ -3,26 +3,26 @@
     <%-include("sidebar-doctor")%>
     <%-include("main-content-top")%>
     <div id="for-alert" style="height:98vh; width:79vw; position: absolute; z-index:2"></div>
-    <a>วันที่ต้องการนัด : </a><input id="date_input" type="date" onchange="changeDate()"><br>
-    <a>หมอ : </a><input list="doctors_data" id="doctor_selected" type="text" disabled><br>
+    <a>วันที่ต้องการนัด : </a><input id="date_input" type="date" onchange="changeDate()" class="form-control col-md-3"><br>
+    <a>แพทย์ : </a><input list="doctors_data" id="doctor_selected" type="text" disabled class="form-control col-md-3"><br>
     <div id="clock-time" style="width:400px; aspect-ratio: 1; margin-bottom:15px; justify-content:center; display: flexbox; align-items: center;">
         <canvas id="clocktext" width="400" height="400" style="position:absolute; width:400px; aspect-ratio:1;"></canvas>
     </div>
     <div id="appointment-below-container">
-        <a>ผู้ป่วย : </a><input list="patients_data" id="patient_selected" type="text" onchange="updateTasks();updateClockData();"><br>
+        <a>ผู้ป่วย : </a><input list="patients_data" id="patient_selected" type="text" onchange="updateTasks();updateClockData();" class="form-control col-md-3"><br>
         <datalist id="patients_data"></datalist>
         <a>เวลาที่ต้องการนัด : </a><input class="start_time_input" id="start_time_input" type="time" oninput="updateTasks();updateDuration();updateClockData();">
         <a>ถึง : </a><input class="end_time_input" id="end_time_input" type="time" disabled><br>
         <div id="services_container">
             <!-- Service Select Appear Here! -->
         </div><br>
-        <button id="add_service_button" onclick="addService();">+</button>
+        <button id="add_service_button" class="btn btn-primary" onclick="addService();">+</button>
         <br>
         <a>ราคารวมบริการทั้งหมด : </a><input type="text" id="all-price-count" placeholder="0 บาท" disabled>
         
-        <br><br><br>
-        <button id="appointment_button" onclick="appointment()">นัดผู้ป่วย</button>
-        <button id="cancel_button">ยกเลิก</button>
+        <br><br>
+        <button id="appointment_button" class="btn btn-success" onclick="appointment()">นัดผู้ป่วย</button>
+        <a href="/schedule" id="cancel_button" class="btn btn-danger">ยกเลิก</a>
     </div>
 
     <%-include("main-content-bottom")%>
@@ -304,8 +304,18 @@
             })
             .then(response => response.text())
             .then(data => {
-                document.getElementById("for-alert").innerHTML = data;
-                document.getElementById("for-alert").style.visibility = "visible";
+                Swal.fire({
+                    title: data,
+                    icon: "warning",
+                    showCancelButton: true,
+                    showConfirmButton: false,
+                    cancelButtonColor: "#3085d6",
+                    cancelButtonText: "ปิด"
+                }).then(() => {
+                    if(data === "คิวของคุณถูกบันทึกลงในระบบแล้ว<br>สามารถตรวจสอบได้ในการนัดหมาย"){
+                         window.location.href = "/doctor_history"
+                    }
+                });
             })
             .catch((error) => {
                 console.error('Error:', error);
