@@ -5,8 +5,8 @@
     <div id="for-alert" style="height:98vh; width:79vw; position: absolute; z-index:2"></div>
     <a>วันที่ต้องการนัด : </a><input id="date_input" type="date" onchange="changeDate()"><br>
     <a>หมอ : </a><input list="doctors_data" id="doctor_selected" type="text" disabled><br>
-    <div id="clock-time" style="width:30%; aspect-ratio: 1; margin-bottom:3vw; justify-content:center; display: flexbox; align-items: center;">
-        <canvas id="clocktext" width="400" height="400" style="position:absolute; width:30%; aspect-ratio:1;"></canvas>
+    <div id="clock-time" style="width:400px; aspect-ratio: 1; margin-bottom:15px; justify-content:center; display: flexbox; align-items: center;">
+        <canvas id="clocktext" width="400" height="400" style="position:absolute; width:400px; aspect-ratio:1;"></canvas>
     </div>
     <div id="appointment-below-container">
         <a>ผู้ป่วย : </a><input list="patients_data" id="patient_selected" type="text" onchange="updateTasks();updateClockData();"><br>

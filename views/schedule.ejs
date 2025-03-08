@@ -215,7 +215,7 @@
             // สำหรับหมอ
             const temTaskDiv = document.createElement("div");
             temTaskDiv.className = "task";
-            temTaskDiv.id = `task-${subtask.task_id}`;
+            temTaskDiv.id = `task-${subtask.task_id}-${subtask.subtask_no}`;
 
             const task_id = document.createElement("p");
             const service_name = document.createElement("p");
@@ -224,12 +224,12 @@
             const end_datetime = document.createElement("p");
             const room_name = document.createElement("p");
 
-            task_id.innerHTML = `รหัส : ${subtask.task_id} ${subtask.task_id}`;
+            task_id.innerHTML = `รหัส : ${subtask.task_id}-${subtask.subtask_no}`;
             service_name.innerHTML = `บริการ: ${subtask.service_name} (${subtask.service_id})`
             start_datetime.innerHTML = `วัน/เวลาที่เริ่ม : ${subtask.start_datetime}`;
             end_datetime.innerHTML = `วัน/เวลาที่เสร็จสิ้น : ${subtask.end_datetime}`;
-            room_name.innerHTML = `ห้อง: ${room_name} หมายเลข ${room_id}`;
-            patient_name.innerHTML `ผู้ป่วย: ${patient_name}`;
+            room_name.innerHTML = `ห้อง: ${subtask.room_name} หมายเลข ${subtask.room_id}`;
+            patient_name.innerHTML = `ผู้ป่วย: ${subtask.patient_name}`;
 
             temTaskDiv.appendChild(task_id);
             temTaskDiv.appendChild(room_name);
@@ -278,7 +278,7 @@
                 }
 
                 subtasks_data.forEach(subtask => {
-                    createSubtaskBar(subtask);
+                    task_container.appendChild(createSubtaskBar(subtask));
                 });
             <% } %>
         }
