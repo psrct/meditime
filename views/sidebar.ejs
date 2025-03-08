@@ -14,10 +14,16 @@
                     <span>หน้าหลัก</span>
                 </a>
             </li>
-            <li class="sidebar-item">
+            <li id="queue" class="sidebar-item">
+                <a href="/queue" class="sidebar-link">
+                    <i class="lni lni-book-1"></i>
+                    <span>จองคิวเข้ารับการรักษา</span>
+                </a>
+            </li>
+            <li id="services" class="sidebar-item">
                 <a href="/services" class="sidebar-link">
                     <i class="lni lni-notebook-1"></i>
-                    <span>จองคิวเข้ารับการรักษา</span>
+                    <span>รายการบริการ</span>
                 </a>
             </li>
             <li id="schedule" class="sidebar-item">
@@ -59,12 +65,16 @@
             document.getElementById("history").removeAttribute("hidden");
             document.getElementById("logout").removeAttribute("hidden");
             document.getElementById("profile").removeAttribute("hidden");
+            document.getElementById("queue").removeAttribute("hidden");
+            document.getElementById("services").removeAttribute("hidden");
             document.getElementById("login").setAttribute("hidden", true);
         }else{
             document.getElementById("schedule").setAttribute("hidden", true);
             document.getElementById("history").setAttribute("hidden", true);
             document.getElementById("logout").setAttribute("hidden", true);
             document.getElementById("profile").setAttribute("hidden", true);
+            document.getElementById("queue").setAttribute("hidden", true);
+            document.getElementById("services").removeAttribute("hidden");
             document.getElementById("login").removeAttribute("hidden");
         }
     </script>
