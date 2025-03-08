@@ -1,7 +1,11 @@
 <%- include("head") %>
 
     <!-- <body style="background-image: url('/public/Fuji.jpg');"> -->
-        <%-include("sidebar-doctor")%>
+        <% if(user.usertype == "doctor"){ %>
+            <%-include("sidebar-doctor")%>
+        <% }else { %>
+            <%-include("sidebar-owner")%>
+        <% } %>
             <%-include("main-content-top")%>
                 <div class="container mt-4">
                     <h1 class="mb-3">Table Of Subtasks</h1>

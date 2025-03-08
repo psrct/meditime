@@ -80,9 +80,6 @@ app.post('/login-staff', function(req, res){
   const sql = `select * from Doctors where username = "${loginData.username}" `;
   if(loginData.username === "sam" && loginData.password === "samowner1234"){
     req.session.user = {
-      id: rows[0].doctor_id,
-      username: rows[0].username,
-      specialty: rows[0].specialty_id,
       usertype: "clinic_owner",
       isLoggedin: true
     }
