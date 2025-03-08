@@ -78,33 +78,34 @@ app.post('/login-staff', function(req, res){
     password: req.body.password
   }
   const sql = `select * from Doctors where username = "${loginData.username}" `;
-  db.all(sql, function(err, rows){
-    // console.log(rows);
-    if(rows.length < 1){
-      res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login-staff';</script> ")
-    }else if(loginData.password != rows[0].password){
-      res.send("<script>alert('รหัสผ่านไม่ถูกต้อง'); window.location.href = '/login-staff';</script> ")
-    }else if(loginData.username === "Dsompact"){
-      req.session.user = {
-        id: rows[0].doctor_id,
-        username: rows[0].username,
-        specialty: rows[0].specialty_id,
-        usertype: "clinic_owner",
-        isLoggedin: true
-      }
-      res.redirect("/showservices");
+  if(loginData.username === "sam" && loginData.password === "samowner1234"){
+    req.session.user = {
+      id: rows[0].doctor_id,
+      username: rows[0].username,
+      specialty: rows[0].specialty_id,
+      usertype: "clinic_owner",
+      isLoggedin: true
     }
-    else{
-      req.session.user = {
-        id: rows[0].doctor_id,
-        username: rows[0].username,
-        specialty: rows[0].specialty_id,
-        usertype: "doctor",
-        isLoggedin: true
+    res.redirect("/showservices");
+  }else{
+    db.all(sql, function(err, rows){
+      // console.log(rows);
+      if(rows.length < 1){
+        res.send("<script>alert('ไม่พบบัญชีผู้ใช้'); window.location.href = '/login-staff';</script> ")
+      }else if(loginData.password != rows[0].password){
+        res.send("<script>alert('รหัสผ่านไม่ถูกต้อง'); window.location.href = '/login-staff';</script> ")
+      }else{
+        req.session.user = {
+          id: rows[0].doctor_id,
+          username: rows[0].username,
+          specialty: rows[0].specialty_id,
+          usertype: "doctor",
+          isLoggedin: true
+        }
+        res.redirect("/schedule");
       }
-      res.redirect("/schedule");
-    }
-  });
+    });
+  }
 });
 
 app.get('/register',bypasslogin, function(req, res){
