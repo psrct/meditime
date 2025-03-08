@@ -148,6 +148,33 @@ app.get('/logout', function(req, res){
 })
 
 
+// --------------------------------  FOR ALL --------------------------------------------------------
+
+
+
+
+
+app.get('/services', function (req, res) {
+  const sql = `
+    SELECT s.service_id AS 'service_id', s.name AS 'service_name', s.price AS 'price', s.duration AS 'duration', s.only_doctor AS 'only_doctor', s.status AS 'status', sc.name AS category_name
+    FROM Services s
+    JOIN Service_categories sc
+    ON s.category_id = sc.category_id
+  `;
+
+  db.all(sql, (err, rows) => {
+    if (err) {
+      console.error('Database error:', err.message);
+      return res.status(500).send('Error fetching data');
+    }
+    res.render('service_table', { data: rows });
+  });
+});
+
+
+
+
+
 // --------------------------------  FOR PATIENT --------------------------------------------------------
 
 app.get('/', function (req, res) {

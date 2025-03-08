@@ -92,6 +92,7 @@
                                     <%=( Math.floor( item.duration / 60) )%> ชั่วโมง
                                         <% } %>
                                             <%=( Math.floor( item.duration % 60) )%> นาที</p>
+                            <p>จองได้ด้วยตนเอง : <%=(item.only_doctor == "Yes") ? "❌" : "✅"%></p>
                             <div class="flex">
                                 <% if (item.status==='Active' ) { %>
                                     <div class="circle2"></div> เปิดให้บริการ
