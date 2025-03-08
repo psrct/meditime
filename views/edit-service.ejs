@@ -104,5 +104,10 @@
         <%-include("script-toggle-edit")%>
         <%-include("main-content-bottom")%>
         <%-include("script-toggle-sidebar")%>
+        <script>
+            document.getElementById("logo").removeAttribute("src");
+            document.getElementById("logo").setAttribute("src", "../logo.png");
+            console.log("done");
+        </script>
     </body>
 </html>

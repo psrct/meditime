@@ -96,6 +96,10 @@
                 grid-template-columns: 1fr;
             }
         }
+        .dropshadow{
+            box-shadow: 1px 1px 10px rgba(0, 0, 0, .2);
+            /* filter: drop-shadow(1px 1px 20px black); */
+        }
     </style>
 
     <body>
@@ -104,7 +108,7 @@
                     <h1>รายการบริการ</h1>
                     <div class="grid mx-5">
                         <% data.forEach((item)=> { %>
-                            <div class="grid-item border p-3">
+                            <div class="grid-item border p-3 dropshadow">
                                 <p>รหัส : <%= item.service_id%></p>
                                 <p>ชื่อบริการ : <%= item.name%></p>
                                 <p>ประเภท: <%= item.category_name%></p>

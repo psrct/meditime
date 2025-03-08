@@ -19,7 +19,8 @@ app.use(session({
   saveUninitialized: false,
   name: 'user',
   cookie: {
-    maxAge: 18000000
+    maxAge: 86400000,
+    httpOnly: true
   }
 }));
 
@@ -143,10 +144,8 @@ app.post('/register', bypasslogin, function(req, res){
 });
 
 app.get('/logout', function(req, res){
+  req.session.destroy();
   res.clearCookie('user');
-  req.session.user = {
-    isLoggedin : false
-  };
   res.redirect('/');
 })
 
@@ -154,6 +153,11 @@ app.get('/logout', function(req, res){
 // --------------------------------  FOR PATIENT --------------------------------------------------------
 
 app.get('/', function (req, res) {
+  if(!req.session.user){
+    req.session.user = {
+      isLoggedin : false
+    };
+  }
   console.log(req.session.user);
   res.redirect('/home');
 });
