@@ -59,6 +59,11 @@
         text-align: center;
         margin-bottom: 20px
     }
+
+    .nodata {
+        height: 65px;
+    }
+    
     #flex{
         display: flex;
     }
@@ -162,6 +167,7 @@
 
 
         function createTaskBar(task) {
+            // สำหรับผู้ป่วย
             const temTaskDiv = document.createElement("div");
             temTaskDiv.className = "task";
             temTaskDiv.id = `task-${task.task_id}`;
@@ -205,22 +211,74 @@
             return temTaskDiv;
         }
 
-        function createSubtaskBar() {
+        function createSubtaskBar(subtask) {
+            // สำหรับหมอ
+            const temTaskDiv = document.createElement("div");
+            temTaskDiv.className = "task";
+            temTaskDiv.id = `task-${subtask.task_id}`;
+
             const task_id = document.createElement("p");
+            const service_name = document.createElement("p");
+            const patient_name = document.createElement("p");
             const start_datetime = document.createElement("p");
             const end_datetime = document.createElement("p");
-            const is_paid = document.createElement("p");
-            const is_completed = document.createElement("p");
+            const room_name = document.createElement("p");
+
+            task_id.innerHTML = `รหัส : ${subtask.task_id} ${subtask.task_id}`;
+            service_name.innerHTML = `บริการ: ${subtask.service_name} (${subtask.service_id})`
+            start_datetime.innerHTML = `วัน/เวลาที่เริ่ม : ${subtask.start_datetime}`;
+            end_datetime.innerHTML = `วัน/เวลาที่เสร็จสิ้น : ${subtask.end_datetime}`;
+            room_name.innerHTML = `ห้อง: ${room_name} หมายเลข ${room_id}`;
+            patient_name.innerHTML `ผู้ป่วย: ${patient_name}`;
+
+            temTaskDiv.appendChild(task_id);
+            temTaskDiv.appendChild(room_name);
+            temTaskDiv.appendChild(service_name);
+            temTaskDiv.appendChild(patient_name);
+            temTaskDiv.appendChild(document.createElement("hr"));
+            temTaskDiv.appendChild(start_datetime);
+            temTaskDiv.appendChild(end_datetime);
+
+            return temTaskDiv;
         }
 
+        function showNoData() {
+            // หากไม่มีข้อมูลในวันดังกล่าว
+            const temTaskDiv = document.createElement("div");
+            temTaskDiv.className = "task nodata";
+            temTaskDiv.id = `task-null`;
+            
+            const showNoDataText = document.createElement("p");
+
+            showNoDataText.innerHTML = `ไม่มีรายการรักษาในวันนี้`;
+
+            temTaskDiv.appendChild(showNoDataText);
+
+            return temTaskDiv;
+        }
         
 
         function showTasks() {
             const task_container = document.getElementById("task-container");
 
             <% if(user.usertype == "patient"){ %>
+                if (tasks_data.length == 0) {
+                    task_container.appendChild(showNoData());
+                    return;
+                }
+
                 tasks_data.forEach(task => {
                     task_container.appendChild(createTaskBar(task));
+                });
+            <% } else if (user.usertype == "doctor") {%>
+                if (subtasks_data.length == 0) {
+                    task_container.appendChild(showNoData());
+                    showNoData();
+                    return;
+                }
+
+                subtasks_data.forEach(subtask => {
+                    createSubtaskBar(subtask);
                 });
             <% } %>
         }
