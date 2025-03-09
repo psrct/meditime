@@ -21,11 +21,6 @@
                             oninput="tasks_filter()">
                         </div>
                         <div class="col-sm-3">
-                            <a>ชื่อหมอ : </a>
-                            <input type="text" id="doctor-search-bar" class="form-control mb-3" placeholder="ใส่ชื่อหมอเพื่อค้นหาประวัติ..."
-                            oninput="tasks_filter()">
-                        </div>
-                        <div class="col-sm-3">
                             <a>วัน/เดือน/ปี : </a>
                             <input type="date" id="date-search-bar" class="form-control mb-3"
                             oninput="tasks_filter()">
@@ -40,7 +35,6 @@
                                     <th>รหัส</th>
                                     <th>ห้อง</th>
                                     <th>ชื่อผู้ป่วย</th>
-                                    <th>ชื่อหมอ</th>
                                     <th>ชื่อบริการ</th>
                                     <th>วัน/เวลาที่เรื่ม</th>
                                     <th>วัน/เวลาที่เสร็จสิ้น</th>
@@ -61,7 +55,6 @@
 
             const service_search_bar = document.getElementById("service-search-bar");
             const patient_search_bar = document.getElementById("patient-search-bar");
-            const doctor_search_bar = document.getElementById("doctor-search-bar");
             const date_search_bar = document.getElementById("date-search-bar");
 
             function showTasks() {
@@ -79,9 +72,6 @@
                     const temPatient = document.createElement("td");
                     temPatient.innerHTML = `${item.patient_name}`;
 
-                    const temDoctor = document.createElement("td");
-                    temDoctor.innerHTML = `${item.doctor_name}`;
-
                     const temService = document.createElement("td");
                     temService.innerHTML = `${item.service_name} (${item.service_id})`;
 
@@ -94,7 +84,6 @@
                     temTr.appendChild(temTaskID);
                     temTr.appendChild(temRoom);
                     temTr.appendChild(temPatient);
-                    temTr.appendChild(temDoctor);
                     temTr.appendChild(temService);
                     temTr.appendChild(temStart);
                     temTr.appendChild(temEnd);
@@ -111,9 +100,6 @@
                 }
                 if (patient_search_bar.value != "") {
                     filter_tasks_data = tasks_data.filter(task => task.patient_name.includes(patient_search_bar.value) && filter_tasks_data.includes(task));
-                }
-                if (doctor_search_bar.value != "") {
-                    filter_tasks_data = tasks_data.filter(task => task.doctor_name.includes(doctor_search_bar.value) && filter_tasks_data.includes(task));
                 }
                 if (date_search_bar.value != "") {
                     filter_tasks_data = tasks_data.filter(task => task.date.includes(date_search_bar.value) && filter_tasks_data.includes(task));

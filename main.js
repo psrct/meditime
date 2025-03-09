@@ -584,7 +584,7 @@ app.get('/doctor_home', checkLoggedIn, isDoctor, function (req, res) {
 });
 
 app.get('/doctor_history', checkLoggedIn, isDoctor, function (req, res) {
-  const query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', p.prename || " " || p.firstname || " " || p.lastname AS 'patient_name', \
+  const query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', p.prename || " " || p.firstname || " " || p.lastname AS 'patient_name', DATE(st.end_datetime) AS 'date', \
                 st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name' FROM Subtasks st\
                 \
                 JOIN Tasks t\
