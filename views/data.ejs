@@ -69,16 +69,16 @@
               <a>เสร็จสิ้นแล้ว : </a>
               <select class="form-control mb-3" onchange="tasks_filter()" style="margin-top:5px;" id="completed-search-bar">
                 <option value="-">-</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
+                <option value="Yes">✅</option>
+                <option value="No">❌</option>
               </select>
             </div>
             <div class="col-sm-1.5" style="margin-left:15px;">
               <a>ชำระเงินแล้ว : </a>
               <select class="form-control mb-3" onchange="tasks_filter()" style="margin-top:5px;" id="paid-search-bar">
                 <option value="-">-</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
+                <option value="Yes">✅</option>
+                <option value="No">❌</option>
               </select>
             </div>
           </div>
@@ -160,19 +160,19 @@
             start_datetime.innerHTML = `วัน/เวลาที่เริ่ม : ${task.start_datetime}`;
             end_datetime.innerHTML = `วัน/เวลาที่เสร็จสิ้น : ${task.end_datetime}`;
             if(task.is_paid==="No"){
-                is_paid.innerHTML = `การชำระเงิน : ❌`;
+                is_paid.innerHTML = `ชำระเงินแล้ว : ❌`;
             }else{
-                is_paid.innerHTML = `การชำระเงิน : ✅`;
+                is_paid.innerHTML = `ชำระเงินแล้ว : ✅`;
             }
             if(task.is_completed==="No"){
-                is_completed.innerHTML = `สถานะ : ❌`;
+                is_completed.innerHTML = `เสร็จสิ้นแล้ว : ❌`;
             }else{
-                is_completed.innerHTML = `สถานะ : ✅`;
+                is_completed.innerHTML = `เสร็จสิ้นแล้ว : ✅`;
             }
 
             temTaskDiv.appendChild(task_id);
-            temTaskDiv.appendChild(is_paid);
             temTaskDiv.appendChild(is_completed);
+            temTaskDiv.appendChild(is_paid);
             temTaskDiv.appendChild(document.createElement("hr"));
             temTaskDiv.appendChild(start_datetime);
             temTaskDiv.appendChild(end_datetime);

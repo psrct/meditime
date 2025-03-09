@@ -256,56 +256,42 @@ app.post('/profile', checkLoggedIn, isPatient, function (req, res) {
   });
 })
 
-app.get('/history', checkLoggedIn, function (req, res) {
-  if (req.session.user.usertype == "patient") {
-    const task_query = ` SELECT * FROM Tasks\
-                        WHERE patient_id = ${req.session.user.id}; `;
-    const subtask_query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', \
-                          sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name', \
-                          d.prename || " " || d.firstname || " " || d.lastname AS 'doctor_name', DATE(st.start_datetime) AS 'date' FROM Subtasks st\
-                          \
-                          JOIN Tasks t\
-                          USING (task_id)\
-                          JOIN Services sv\
-                          USING (service_id)\
-                          JOIN Service_categories sc\
-                          USING (category_id)\
-                          JOIN Patients p\
-                          USING (patient_id)\
-                          JOIN Rooms r\
-                          USING (room_id)\
-                          JOIN Doctors d\
-                          USING (doctor_id)\
-                          WHERE patient_id = ${req.session.user.id}\
-                          ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `
-    db.all(task_query, (err, tasks_rows) => {
-      if (err) {
-        console.log(err.message);
-      }
+app.get('/history', checkLoggedIn, isPatient, function (req, res) {
+  const task_query = ` SELECT * FROM Tasks\
+                      WHERE patient_id = ${req.session.user.id}; `;
+  const subtask_query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', \
+                        sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name', \
+                        d.prename || " " || d.firstname || " " || d.lastname AS 'doctor_name', DATE(st.start_datetime) AS 'date' FROM Subtasks st\
+                        \
+                        JOIN Tasks t\
+                        USING (task_id)\
+                        JOIN Services sv\
+                        USING (service_id)\
+                        JOIN Service_categories sc\
+                        USING (category_id)\
+                        JOIN Patients p\
+                        USING (patient_id)\
+                        JOIN Rooms r\
+                        USING (room_id)\
+                        JOIN Doctors d\
+                        USING (doctor_id)\
+                        WHERE patient_id = ${req.session.user.id}\
+                        ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `
+  db.all(task_query, (err, tasks_rows) => {
+    if (err) {
+      console.log(err.message);
+    }
 
-      db.all(subtask_query, (err, subtasks_rows) => {
-        if (err) {
-          console.log(err.message);
-        }
-
-        return res.render('data', { tasks_data: tasks_rows,
-                              subtasks_data: subtasks_rows
-        });
-      });
-    });
-  } else if (req.session.user.usertype == "doctor") {
-    const subtask_query = ` SELECT * FROM Subtasks\
-                          WHERE doctor_id = ${req.session.user.id}; `;
     db.all(subtask_query, (err, subtasks_rows) => {
       if (err) {
         console.log(err.message);
       }
 
-      return res.render('data', { subtasks_data: subtasks_rows });
+      return res.render('data', { tasks_data: tasks_rows,
+                            subtasks_data: subtasks_rows
+      });
     });
-  } else {
-    return res.redirect("/");
-  }
+  });
 });
 
 // -------------------------------------- FOR CLINIC OWNER -------------------------------------------------------
@@ -532,29 +518,38 @@ app.get('/deleteservice/:id', checkLoggedIn, isOwner, (req, res) => {
 });
 
 app.get('/records', checkLoggedIn, isOwner, function (req, res) {
-  const query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', p.patient_id AS 'patient_id', p.prename || " " || p.firstname || " " || p.lastname AS 'patient_name', \
-                st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name', \
-                d.prename || " " || d.firstname || " " || d.lastname AS 'doctor_name', DATE(st.start_datetime) AS 'date' FROM Subtasks st\
-                \
-                JOIN Tasks t\
-                USING (task_id)\
-                JOIN Services sv\
-                USING (service_id)\
-                JOIN Service_categories sc\
-                USING (category_id)\
-                JOIN Patients p\
-                USING (patient_id)\
-                JOIN Rooms r\
-                USING (room_id)\
-                JOIN Doctors d\
-                USING (doctor_id)\
-                ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `
-  db.all(query, (err, rows) => {
+  const task_query = ` SELECT * FROM Tasks; `;
+  const subtask_query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', \
+                        sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name', \
+                        d.prename || " " || d.firstname || " " || d.lastname AS 'doctor_name', DATE(st.start_datetime) AS 'date' FROM Subtasks st\
+                        \
+                        JOIN Tasks t\
+                        USING (task_id)\
+                        JOIN Services sv\
+                        USING (service_id)\
+                        JOIN Service_categories sc\
+                        USING (category_id)\
+                        JOIN Patients p\
+                        USING (patient_id)\
+                        JOIN Rooms r\
+                        USING (room_id)\
+                        JOIN Doctors d\
+                        USING (doctor_id)\
+                        ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `
+  db.all(task_query, (err, tasks_rows) => {
     if (err) {
       console.log(err.message);
     }
-    console.log(rows);
-    res.render('datasubtask', { data: rows });
+
+    db.all(subtask_query, (err, subtasks_rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+
+      return res.render('data', { tasks_data: tasks_rows,
+                                  subtasks_data: subtasks_rows
+      });
+    });
   });
 });
 
