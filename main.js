@@ -160,6 +160,7 @@ app.get('/services', function (req, res) {
     FROM Services s
     JOIN Service_categories sc
     ON s.category_id = sc.category_id
+    ORDER BY s.category_id ASC, service_id ASC;
   `;
 
   db.all(sql, (err, rows) => {
@@ -413,6 +414,7 @@ app.get('/showservices', checkLoggedIn, isOwner, function (req, res) {
     FROM Services s
     JOIN Service_categories sc
     ON s.category_id = sc.category_id
+    ORDER BY s.category_id ASC, service_id ASC;
   `;
 
   db.all(sql, (err, rows) => {
