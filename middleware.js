@@ -20,7 +20,7 @@ exports.isOwner = (req, res, next)=>{
     if(req.session.user.usertype == "clinic_owner"){
         next()
     }else{
-        res.redirect('/doctor_home');
+        res.redirect('/schedule');
     }
 }
 
