@@ -225,7 +225,7 @@ app.get('/profile', checkLoggedIn, isPatient, function (req, res) {
   db.all(sql, function (err, rows) {
     console.log(rows);
     res.render('profile', { data: rows });
-  }); a
+  });
 })
 
 app.post('/profile', checkLoggedIn, isPatient, function (req, res) {
