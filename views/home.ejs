@@ -1,33 +1,35 @@
 <%-include("head")%>
     <style>
         nav {
-            background: #999074;
+            background: #f0f0f0 !important;
         }
 
         .main-header {
             text-align: center;
-            background: #5DADE2;
+            background: linear-gradient(to right, #5DADE2, #3498DB);
             color: white;
-            padding: 20px;
+            padding: 40px;
             border-radius: 10px 10px 0 0;
         }
 
         .section {
-            padding: 20px;
-            margin-top: 10px;
-            background: #c6ffde;
-            border-radius: 5px;
+            padding: 30px;
+            margin-top: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
+
         h2 {
-            color: #030303;
+            color: #333;
+            font-weight: bold;
         }
 
         .services ul,
         li {
-            list-style: circle;
-            margin: 0;
-            padding: 0;
+            list-style-type: square;
+            padding-left: 20px;
         }
 
         #contact p {
@@ -37,17 +39,33 @@
         .review-card {
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             background: #fff;
             text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
         }
 
         .review-card img {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             margin-bottom: 10px;
         }
+
+        .card {
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
 
         @media (max-width: 768px) {
             .main {
@@ -102,6 +120,27 @@
                                     <% }) %>
                             </div>
                             <br>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>ฉีดวัคซีน</h2>
+                        <br>
+                        <div class="row">
+                            <% vaccines.forEach(vaccine=> { %>
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <img src="vaccine.jpg" class="card-img-top" alt="Vaccine">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <%= vaccine.title %>
+                                            </h5>
+                                            <p class="card-text">ราคา: <%= vaccine.price %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }); %>
                         </div>
                     </section>
 
