@@ -188,7 +188,11 @@ app.get('/', function (req, res) {
 });
 
 app.get('/home', function (req, res) {
-
+  const vaccineData = [
+    { title: "วัคซีน HPV 9 สายพันธุ์", price: "15,000 บาท", img: "https://via.placeholder.com/150" },
+    { title: "วัคซีน HPV ป้องกันมะเร็งปากมดลูก", price: "8,900 บาท", img: "https://via.placeholder.com/150" },
+    { title: "วัคซีน HPV สำหรับหญิงอายุ 15 ปีขึ้นไป", price: "6,500 บาท", img: "https://via.placeholder.com/150" }
+  ];
   const reviews = [
     {
       name: "A",
@@ -211,7 +215,7 @@ app.get('/home', function (req, res) {
       comment: "รู้จักผ่าน Facebook...และน่าเชื่อถือค่ะ"
     }
   ];
-  res.render("home", { reviews });
+  res.render("home", { reviews, vaccines: vaccineData });
 });
 
 
