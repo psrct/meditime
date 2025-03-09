@@ -1,5 +1,46 @@
 <%- include("head") %>
 
+<style>
+  .inner-container {
+    width : 1000px;
+    height : 200px;
+    margin-bottom: 20px;
+    transition: height 0.5s ease;
+  }
+
+  .task {
+      position: absolute;
+      background-color : rgb(205, 205, 205);;
+      width : 1000px;
+      height : 200px;
+      cursor : pointer;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      z-index: 2;
+  }
+
+  .subtask {
+    width : 1000px;
+    height : 100px;
+    position: absolute;
+    background-color: white;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    opacity: 0;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 20%);
+  }
+
+  .subtask.show {
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    opacity: 1;
+    z-index: 1;
+  }
+</style>
   <body>
     <% if(user.usertype == "patient"){ %>
       <%-include("sidebar")%>
@@ -8,57 +49,193 @@
     <% } %>
       <%-include("main-content-top")%>
         <div class="container mt-4">
-          <input type="text" id="search-bar" class="form-control mb-3" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ..."
-            oninput="tasks_filter()">
-          <h1 class="mb-3">Table Of Task</h1>
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered">
-              <thead class="table-dark">
-                <tr>
-                  <th>TaskID</th>
-                  <th>PatientID</th>
-                  <th>Start</th>
-                  <th>End</th>
-                  <th>Completed?</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% tasks_data.forEach((item)=> { %>
-                  <tr>
-                    <td>
-                      <%= item.task_id %>
-                    </td>
-                    <td>
-                      <%= item.patient_id %>
-                    </td>
-                    <td>
-                      <%= item.start_datetime %>
-                    </td>
-                    <td>
-                      <%= item.end_datetime %>
-                    </td>
-                    <td class="text-center">
-                      <%= item.is_completed ? "✅" : "❌" %>
-                    </td>
-                  </tr>
-                  <% }) %>
-              </tbody>
-            </table>
+          <div style="display:flex">
+            <div class="col-sm-3">
+              <a>ชื่อบริการ : </a>
+              <input type="text" id="service-search-bar" class="form-control mb-3" placeholder="ใส่ชื่อบริการเพื่อค้นหาประวัติ..."
+              oninput="tasks_filter()">
+            </div>
+            <div class="col-sm-3">
+              <a>ชื่อหมอ : </a>
+              <input type="text" id="doctor-search-bar" class="form-control mb-3" placeholder="ใส่ชื่อหมอเพื่อค้นหาประวัติ..."
+              oninput="tasks_filter()">
+            </div>
+            <div class="col-sm-3">
+              <a>วัน/เดือน/ปี : </a>
+              <input type="date" id="date-search-bar" class="form-control mb-3"
+              oninput="tasks_filter()">
+            </div>
+            <div class="col-sm-1.5">
+              <a>เสร็จสิ้นแล้ว : </a>
+              <select class="form-control mb-3" onchange="tasks_filter()" style="margin-top:5px;" id="completed-search-bar">
+                <option value="-">-</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div class="col-sm-1.5" style="margin-left:15px;">
+              <a>ชำระเงินแล้ว : </a>
+              <select class="form-control mb-3" onchange="tasks_filter()" style="margin-top:5px;" id="paid-search-bar">
+                <option value="-">-</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+          
+          <h1 class="mb-3">ประวัติการรักษา</h1>
+
+          <div id="task-container">
+
           </div>
         </div>
         <%-include("main-content-bottom")%>
-          <%-include("script-toggle-sidebar")%>
-            <script>
+        <%-include("script-toggle-sidebar")%>
+        <script>
 
-      <% if (user.usertype == "patient") { %>
-        const tasks_data = <% -JSON.stringify(tasks_data) %>;
-      <% } %>
-      const subtasks_data = <% -JSON.stringify(subtasks_data) %>;
+          const tasks_data = <%-JSON.stringify(tasks_data)%>;
+          const subtasks_data = <%-JSON.stringify(subtasks_data)%>;
 
-              function tasks_filter() {
+          const task_container = document.getElementById("task-container");
 
+          const service_search_bar = document.getElementById("service-search-bar");
+          const doctor_search_bar = document.getElementById("doctor-search-bar");
+          const date_search_bar = document.getElementById("date-search-bar");
+          const completed_search_bar = document.getElementById("completed-search-bar");
+          const paid_search_bar = document.getElementById("paid-search-bar");
+
+          let filter_subtasks_data = [];
+          let task_status = [];
+
+          function showTasks() {
+            task_container.innerHTML = "";
+
+            const filter_task_id = [...new Set(filter_subtasks_data.map(subtask => subtask.task_id))];
+            filter_task_id.forEach(task_id => {
+              task_container.appendChild(createTasks(tasks_data.find(task => task.task_id == task_id)));
+            });
+          }
+
+          function tasks_filter() {
+            console.log("yes")
+            filter_subtasks_data = subtasks_data;
+
+            if (service_search_bar.value != "") {
+              filter_subtasks_data = subtasks_data.filter(subtask => subtask.service_name.includes(service_search_bar.value) && filter_subtasks_data.includes(subtask));
+            }
+            if (doctor_search_bar.value != "") {
+              filter_subtasks_data = subtasks_data.filter(subtask => subtask.doctor_name.includes(doctor_search_bar.value) && filter_subtasks_data.includes(subtask));
+            }
+            if (date_search_bar.value != "") {
+              filter_subtasks_data = subtasks_data.filter(subtask => subtask.date.includes(date_search_bar.value) && filter_subtasks_data.includes(subtask));
+            }
+            if (completed_search_bar.value != "-") {
+              filter_subtasks_data = subtasks_data.filter(subtask => tasks_data.find(task => task.task_id == subtask.task_id).is_completed == completed_search_bar.value && filter_subtasks_data.includes(subtask));
+            }
+            if (paid_search_bar.value != "-") {
+              filter_subtasks_data = subtasks_data.filter(subtask => tasks_data.find(task => task.task_id == subtask.task_id).is_paid == paid_search_bar.value && filter_subtasks_data.includes(subtask));
+            }
+            showTasks();
+          }
+          tasks_filter();
+
+          function createTasks(task) {
+            const temDiv = document.createElement("div");
+            temDiv.className = "inner-container";
+            temDiv.id = `task-${task.task_id}`;
+
+            const temTaskDiv = document.createElement("div");
+            temTaskDiv.className = "task";
+            temTaskDiv.onclick = function() {
+              displaySubtasks(task.task_id);
+            }
+
+            const task_id = document.createElement("p");
+            const start_datetime = document.createElement("p");
+            const end_datetime = document.createElement("p");
+            const is_paid = document.createElement("p");
+            const is_completed = document.createElement("p");
+
+            task_id.innerHTML = `รหัส : ${task.task_id}`;
+            start_datetime.innerHTML = `วัน/เวลาที่เริ่ม : ${task.start_datetime}`;
+            end_datetime.innerHTML = `วัน/เวลาที่เสร็จสิ้น : ${task.end_datetime}`;
+            if(task.is_paid==="No"){
+                is_paid.innerHTML = `การชำระเงิน : ❌`;
+            }else{
+                is_paid.innerHTML = `การชำระเงิน : ✅`;
+            }
+            if(task.is_completed==="No"){
+                is_completed.innerHTML = `สถานะ : ❌`;
+            }else{
+                is_completed.innerHTML = `สถานะ : ✅`;
+            }
+
+            temTaskDiv.appendChild(task_id);
+            temTaskDiv.appendChild(is_paid);
+            temTaskDiv.appendChild(is_completed);
+            temTaskDiv.appendChild(document.createElement("hr"));
+            temTaskDiv.appendChild(start_datetime);
+            temTaskDiv.appendChild(end_datetime);
+
+            const temSubtasks = filter_subtasks_data.filter(subtask => subtask.task_id == task.task_id);
+
+            temSubtasks.forEach(subtask => {
+              const subtaskDiv = document.createElement("div");
+              subtaskDiv.className = "subtask";
+
+              const tem_room = document.createElement("div");
+              const tem_doctor = document.createElement("div");
+              const tem_service = document.createElement("div");
+              const tem_start_datetime = document.createElement("div");
+              const tem_end_datetime = document.createElement("div");
+
+              tem_room.innerHTML = `ห้อง :<br>${subtask.room_name} (${subtask.room_id})`;
+              tem_doctor.innerHTML = `หมอ :<br>${subtask.doctor_name}`;
+              tem_service.innerHTML = `บริการ :<br>${subtask.service_name}`;
+              tem_start_datetime.innerHTML = `วัน/เวลาที่เริ่ม :<br>${subtask.start_datetime}`;
+              tem_end_datetime.innerHTML = `วัน/เวลาที่เสร็จสิ้น :<br>${subtask.end_datetime}`;
+
+              subtaskDiv.appendChild(tem_room);
+              subtaskDiv.appendChild(tem_doctor);
+              subtaskDiv.appendChild(tem_service);
+              subtaskDiv.appendChild(tem_start_datetime);
+              subtaskDiv.appendChild(tem_end_datetime);
+
+              subtaskDiv.setAttribute("data-status", "hide");
+
+              temDiv.appendChild(subtaskDiv);
+            });
+
+            temDiv.appendChild(temTaskDiv);
+            return temDiv;
+          }
+  
+          function displaySubtasks(id) {
+              const task_div = document.getElementById(`task-${id}`);
+  
+              let tranformY = 210;
+
+              if (task_div.getAttribute("data-status") == "show") {
+                task_div.style.height = `200px`;
+
+                task_div.querySelectorAll(".subtask").forEach(subtaskDiv => {
+                  subtaskDiv.style.transform = `translateY(0px)`;
+                  subtaskDiv.classList.remove("show");
+                });
+                task_div.setAttribute("data-status", "hide");
+              } else {
+                task_div.style.height = `${200 + task_div.querySelectorAll(".subtask").length * 110}px`;
+
+                task_div.querySelectorAll(".subtask").forEach(subtaskDiv => {
+                  subtaskDiv.style.transform = `translateY(${tranformY}px)`;
+                  subtaskDiv.classList.add("show");
+
+                  tranformY += 110;
+                });
+                task_div.setAttribute("data-status", "show");
               }
-            </script>
+          }
+        </script>
   </body>
 
   </html>
