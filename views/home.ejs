@@ -15,7 +15,7 @@
         .section {
             padding: 20px;
             margin-top: 10px;
-            background: #fff;
+            background: #c6ffde;
             border-radius: 5px;
         }
 
@@ -32,6 +32,21 @@
 
         #contact p {
             margin: 5px 0;
+        }
+
+        .review-card {
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            text-align: center;
+        }
+
+        .review-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
         }
 
         @media (max-width: 768px) {
@@ -65,6 +80,29 @@
                             <li>ให้คำปรึกษาด้านสุขภาพ</li>
                             <li>กายภาพบำบัดและฟื้นฟูสุขภาพ</li>
                         </ul>
+                    </section>
+
+                    <section>
+                        <div class="container mt-5">
+                            <h2 class="text-center">💖 Meditime มีลูกค้ามากกว่า 200,000 คน 🤟</h2>
+                            <div class="row mt-4">
+                                <% reviews.forEach(review=> { %>
+                                    <div class="col-md-3">
+                                        <div class="review-card">
+                                            <img src="<%= review.image %>" alt="profile">
+                                            <h5>
+                                                <%= review.name %>
+                                            </h5>
+                                            <p>
+                                                <%= review.comment %>
+                                            </p>
+                                            <p class="text-muted">รีวิวจาก Google</p>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                            <br>
+                        </div>
                     </section>
 
                     <section id="contact" class="section">
