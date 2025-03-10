@@ -57,8 +57,21 @@
             const patient_search_bar = document.getElementById("patient-search-bar");
             const date_search_bar = document.getElementById("date-search-bar");
 
+            function showNoData() {
+                const temDiv = document.createElement("div");
+                temDiv.className = "inner-container";
+                temDiv.innerHTML = "ไม่มีประวัติการรักษา";
+
+                tbody.appendChild(document.createElement("br"));
+                tbody.appendChild(temDiv);
+            }
+                
             function showTasks() {
                 tbody.innerHTML = "";
+
+                if (filter_tasks_data.length == 0) {
+                    showNoData();
+                }
 
                 filter_tasks_data.forEach(item => {
                     const temTr = document.createElement("tr");

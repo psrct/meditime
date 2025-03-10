@@ -50,6 +50,10 @@
     opacity: 1;
     z-index: 1;
   }
+
+  hr {
+      border-top: 2px solid rgba(0, 0, 0, 0.323);
+  }
 </style>
   <body>
     <% if(user.usertype == "patient"){ %>
@@ -115,19 +119,39 @@
           const paid_search_bar = document.getElementById("paid-search-bar");
 
           let filter_subtasks_data = [];
-          let task_status = [];
+          let task_status = {};
+
+          tasks_data.forEach(task => {
+            task_status[task.task_id] = "hide";
+          });
+
+          function showNoData() {
+            const temDiv = document.createElement("div");
+            temDiv.className = "inner-container";
+            temDiv.innerHTML = "ไม่มีประวัติการรักษา";
+
+            task_container.appendChild(temDiv);
+          }
 
           function showTasks() {
             task_container.innerHTML = "";
 
             const filter_task_id = [...new Set(filter_subtasks_data.map(subtask => subtask.task_id))];
+
+            if (filter_task_id.length == 0) {
+              showNoData();
+            }
+
             filter_task_id.forEach(task_id => {
               task_container.appendChild(createTasks(tasks_data.find(task => task.task_id == task_id)));
+
+              if (task_status[task_id] == "show") {
+                displaySubtasks(task_id);
+              }
             });
           }
 
           function tasks_filter() {
-            console.log("yes")
             filter_subtasks_data = subtasks_data;
 
             if (service_search_bar.value != "") {
@@ -233,6 +257,8 @@
                   subtaskDiv.classList.remove("show");
                 });
                 task_div.setAttribute("data-status", "hide");
+
+                task_status[id] = "hide";
               } else {
                 task_div.style.height = `${200 + task_div.querySelectorAll(".subtask").length * 110}px`;
 
@@ -243,6 +269,8 @@
                   tranformY += 110;
                 });
                 task_div.setAttribute("data-status", "show");
+
+                task_status[id] = "show";
               }
           }
         </script>

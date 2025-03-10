@@ -190,9 +190,9 @@ app.get('/', function (req, res) {
 
 app.get('/home', function (req, res) {
   const vaccineData = [
-    { title: "วัคซีน HPV 9 สายพันธุ์", price: "15,000 บาท", img: "https://via.placeholder.com/150" },
-    { title: "วัคซีน HPV ป้องกันมะเร็งปากมดลูก", price: "8,900 บาท", img: "https://via.placeholder.com/150" },
-    { title: "วัคซีน HPV สำหรับหญิงอายุ 15 ปีขึ้นไป", price: "6,500 บาท", img: "https://via.placeholder.com/150" }
+    { title: "วัคซีนป้องกันมะเร็งปากมดลูก 9 สายพันธุ์ (3 เข็ม)", price: "18,900 บาท", img: "https://via.placeholder.com/150" },
+    { title: "วัคซีนป้องกันโรคหัด คางทูม หัดเยอรมัน (MMR)", price: "861 บาท", img: "https://via.placeholder.com/150" },
+    { title: "ฉีดวัคซีนไข้หวัดใหญ่ 4 สายพันธุ์", price: "242 บาท", img: "https://via.placeholder.com/150" }
   ];
   const reviews = [
     {

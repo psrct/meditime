@@ -84,7 +84,11 @@
     </style>
 
     <body>
-        <%-include("sidebar")%>
+        <% if(user.usertype == "doctor"){ %>
+            <%-include("sidebar-doctor")%>
+        <% } else { %>
+            <%-include("sidebar")%>
+        <% } %>
             <%-include("main-content-top")%>
                 <h1>รายการบริการ</h1>
                 <div class="grid mx-5">
