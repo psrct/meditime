@@ -1,0 +1,85 @@
+<%-include("head")%>
+<style>
+    input {
+        font-size: 18px;
+    }
+
+    .txtbox{
+        color: rgb(157, 157, 157);
+    }
+    .option{
+        color: rgb(157, 157, 157);
+    }
+    .nochange{
+        color: rgb(157, 157, 157);
+    }
+
+</style>
+<body>
+    <div class="d-flex">
+        <div class="main">
+        <nav class="navbar navbar-expand border-bottom">
+            <a href="/records">
+                <button class="toggler-btn" type="button">
+                    <i class="lni lni-chevron-left"></i>
+                </button>
+            </a>
+        </nav>
+        <main class="p-3">
+            <div class="container-fluid">
+                <div class="container">
+                    <form action="/records/<%=tasks_data[0].task_id%>" method="post">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="task_id">task_id</label>
+                            <input class="form-control fix" id="task_id"  name="task_id" value="<%=tasks_data[0].task_id%>" readonly><br><br>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="patient_id">patient_id</label>
+                            <input class="form-control fix" id="patient_id"  name="patient_id" value="<%=tasks_data[0].patient_id%>" readonly><br><br>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-5">
+                            <label for="start_datetime">เวลานัด</label>
+                            <input class="form-control fix" id="start_datetime" name="start_datetime" value="<%=tasks_data[0].start_datetime%>" readonly><br><br>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label for="end_datetime">end_datetime</label>
+                            <input class="form-control fix" id="end_datetime"  name="end_datetime" value="<%=tasks_data[0].end_datetime%>" readonly><br><br>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="is_completed">เข้ารับบริการ</label>
+                            <select class="form-control" id="is_completed" class="option" name="is_completed" disabled>
+                                <option value="Yes" id="Yes">Yes</option>
+                                <option value="No" id="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="is_paid">ชำระแล้ว</label>
+                            <select class="form-control" id="is_paid" class="option" name="is_paid" disabled>
+                                <option value="Yes" id="Yes">Yes</option>
+                                <option value="No" id="No">No</option>
+                            </select>
+                        </div>
+                    </div>
+                
+                    <input class="btn btn-secondary" onclick="toggleEdit()" type="button" value="แก้ไขข้อมูล">
+                    <input class="btn btn-success" type="submit" value="บันทึก">
+                    </form>
+                 </div>
+            </div>
+        </main>
+        </div>
+    </div>
+    <%-include("script-toggle-edit")%>
+    <script>
+       document.getElementById("is_completed").value = "<%=tasks_data[0].is_completed%>"
+       document.getElementById("is_paid").value = "<%=tasks_data[0].is_paid%>"
+    </script>
+
+</body>
+</html>
+

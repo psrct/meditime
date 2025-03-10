@@ -204,10 +204,12 @@
             }
 
             <% if(user.usertype == "clinic_owner"){ %>
+              const aedit = document.createElement('a');
+              aedit.href = `/records/${task.task_id}`;
               const temEditButton = document.createElement("button");
               temEditButton.innerHTML = `<i class="lni lni-pencil-1" style="font-size:25px"></i>`;
               temEditButton.className = "edit-button";
-              temEditButton.onclick = "  "; // Routing to Edit
+              aedit.appendChild(temEditButton);
             <% } %>
 
             const task_id = document.createElement("p");
@@ -267,7 +269,7 @@
             });
 
             temDiv.appendChild(temTaskDiv);
-            temDiv.appendChild(temEditButton);
+            temDiv.appendChild(aedit);
             return temDiv;
           }
   

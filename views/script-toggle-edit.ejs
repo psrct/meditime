@@ -6,9 +6,15 @@
             console.log("not Editing")
 
             let txtbox = document.getElementsByClassName("form-control");
+            let fix = document.getElementsByClassName("fix");
             for(let i=0; i<txtbox.length; i++){
                 txtbox.item(i).removeAttribute("readonly");
                 txtbox.item(i).removeAttribute("disabled");
+                
+            }
+            for(let i=0; i<fix.length; i++){
+                fix.item(i).setAttribute("readonly", true);
+                fix.item(i).setAttribute("disabled", true);
                 
             }
             isedit = true;
@@ -17,9 +23,15 @@
             console.log("Editing")
             
             let txtbox = document.getElementsByClassName("form-control");
+            let fix = document.getElementsByClassName("fix");
             for(let i=0; i<txtbox.length; i++){
                 txtbox.item(i).setAttribute("readonly", true);
                 txtbox.item(i).setAttribute("disabled", true);
+                
+            }
+            for(let i=0; i<fix.length; i++){
+                fix.item(i).setAttribute("readonly", true);
+                fix.item(i).setAttribute("disabled", true);
                 
             }
             isedit = false;

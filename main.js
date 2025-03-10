@@ -555,6 +555,52 @@ app.get('/records', checkLoggedIn, isOwner, function (req, res) {
   });
 });
 
+app.get('/records/:id', checkLoggedIn, isOwner, function (req, res) {
+  const task_query = ` SELECT * FROM Tasks WHERE task_id = ${req.params.id}; `;
+  const subtask_query = `SELECT st.task_id AS 'task_id', st.subtask_no AS 'subtask_no', st.room_id AS 'room_id', r.name AS 'room_name', st.service_id AS 'service_id', \
+                        sv.name AS 'service_name', st.start_datetime AS 'start_datetime', st.end_datetime AS 'end_datetime', sv.price AS 'price', sv.duration AS 'duration', sc.name AS 'category_name', \
+                        d.prename || " " || d.firstname || " " || d.lastname AS 'doctor_name', DATE(st.start_datetime) AS 'date' FROM Subtasks st\
+                        \
+                        JOIN Tasks t\
+                        USING (task_id)\
+                        JOIN Services sv\
+                        USING (service_id)\
+                        JOIN Service_categories sc\
+                        USING (category_id)\
+                        JOIN Patients p\
+                        USING (patient_id)\
+                        JOIN Rooms r\
+                        USING (room_id)\
+                        JOIN Doctors d\
+                        USING (doctor_id)\
+                        WHERE task_id = ${req.params.id}\
+                        ORDER BY DATETIME(st.start_datetime) DESC, t.task_id DESC, st.subtask_no DESC; `
+  db.all(task_query, (err, tasks_rows) => {
+    if (err) {
+      console.log(err.message);
+    }
+
+    db.all(subtask_query, (err, subtasks_rows) => {
+      if (err) {
+        console.log(err.message);
+      }
+
+      return res.render('data-edit', { tasks_data: tasks_rows });
+    });
+  });
+});
+
+app.post("/records/:id", checkLoggedIn, isOwner, function(req, res){
+  const sql = ` UPDATE Tasks\
+  SET is_completed = "${req.body.is_completed}",\
+  is_paid = "${req.body.is_paid}"\
+  WHERE task_id = ${req.params.id}; `;
+  db.run(sql, function (err) {
+    if (err) throw err;
+    console.log(`update task_id ${req.params.id}.`);
+  });
+  res.redirect(`/records/${req.params.id}`);
+})
 // -------------------------------------- FOR DOCTOR  -------------------------------------------------------
 
 
