@@ -100,6 +100,13 @@
             box-shadow: 1px 1px 10px rgba(0, 0, 0, .2);
             /* filter: drop-shadow(1px 1px 20px black); */
         }
+        .add:hover{
+            background-color : #dedada;
+            color: white;
+            transform: scale(0.98);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+          }
     </style>
 
     <body>
@@ -132,7 +139,7 @@
                         <% }) %>
                     </div>
                     <div class="d-flex flex-row justify-content-end fixed-bottom mx-3 my-3">
-                        <a href="/add" class="btn border"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M16 2H8C4.691 2 2 4.691 2 8v13a1 1 0 0 0 1 1h13c3.309 0 6-2.691 6-6V8c0-3.309-2.691-6-6-6zm4 14c0 2.206-1.794 4-4 4H4V8c0-2.206 1.794-4 4-4h8c2.206 0 4 1.794 4 4v8z"></path><path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4z"></path></svg></a>
+                        <a href="/add" class="btn border add"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M16 2H8C4.691 2 2 4.691 2 8v13a1 1 0 0 0 1 1h13c3.309 0 6-2.691 6-6V8c0-3.309-2.691-6-6-6zm4 14c0 2.206-1.794 4-4 4H4V8c0-2.206 1.794-4 4-4h8c2.206 0 4 1.794 4 4v8z"></path><path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4z"></path></svg></a>
                     </div>
         <%-include("main-content-bottom")%>
         <%-include("script-toggle-sidebar")%>
