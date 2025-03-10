@@ -9,17 +9,17 @@
   }
 
   .task {
-      position: absolute;
-      background-color : white;
-      width : 1000px;
-      height : 215px;
-      cursor : pointer;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      z-index: 2;
-      border: solid 1px #01069b;
-      transition: all 0.2s ease-in-out;
+    position: absolute;
+    background-color : white;
+    width : 1000px;
+    height : 215px;
+    cursor : pointer;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 2;
+    border: solid 1px #01069b;
+    transition: all 0.2s ease-in-out;
   }
   .task:hover{
     background-color : #0077b6;
@@ -53,6 +53,24 @@
 
   hr {
       border-top: 2px solid rgba(0, 0, 0, 0.323);
+  }
+
+  .edit-button {
+    margin-left: -50px;
+    margin-top: 25px;
+    aspect-ratio: 1;
+    transition: all 0.2s ease-in-out;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background: white;
+  }
+
+  .edit-button:hover{
+    background-color : #0077b6;
+    color: white;
+    transform: scale(0.98);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
   }
 </style>
   <body>
@@ -178,11 +196,19 @@
             temDiv.className = "inner-container";
             temDiv.id = `task-${task.task_id}`;
 
+            
             const temTaskDiv = document.createElement("div");
             temTaskDiv.className = "task";
             temTaskDiv.onclick = function() {
               displaySubtasks(task.task_id);
             }
+
+            <% if(user.usertype == "clinic_owner"){ %>
+              const temEditButton = document.createElement("button");
+              temEditButton.innerHTML = `<i class="lni lni-pencil-1" style="font-size:25px"></i>`;
+              temEditButton.className = "edit-button";
+              temEditButton.onclick = "  "; // Routing to Edit
+            <% } %>
 
             const task_id = document.createElement("p");
             const start_datetime = document.createElement("p");
@@ -241,6 +267,7 @@
             });
 
             temDiv.appendChild(temTaskDiv);
+            temDiv.appendChild(temEditButton);
             return temDiv;
           }
   
