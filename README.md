@@ -1,19 +1,21 @@
 # Meditime
-กดดับเบิ้ลคลิก startserver.bat เพื่อ run server
+## วิธีการใช้งาน  
+## กดดับเบิ้ลคลิก startserver.bat เพื่อ run server
 
-Username & Password
-คนไข้(ผู้ใช้)
-    Username : KunSmun555
-    Password : 1234
-,   Username : KunSaraluckChan
-    Password : 281101
+### บัญชีตัวอย่าง  
 
-แพทย์
-    Username : MariMonday
-    Password : 09122023
-,   Username : DocMarani:3
-    Password : marani303
+#### 🏥 คนไข้  
+- **Username:** KunSmun555  
+  **Password:** 1234  
+- **Username:** KunSaraluckChan  
+  **Password:** 281101  
 
-เจ้าของคลินิก
-    Username : sam
-    Password : samowner1234
+#### 👨‍⚕️ แพทย์  
+- **Username:** MariMonday  
+  **Password:** 09122023  
+- **Username:** DocMarani:3  
+  **Password:** marani303  
+
+#### 🏠 เจ้าของคลินิก  
+- **Username:** sam  
+  **Password:** samowner1234
