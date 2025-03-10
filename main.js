@@ -121,11 +121,15 @@ app.post('/register', bypasslogin, function (req, res) {
     prename: req.body.prename,
     firstname: req.body.firstname,
     lastname: req.body.lastname,
+    iden_id: req.body.iden_id,
+    contact_num: req.body.contact_number,
+    add_contact: req.body.add_contact,
+    medical_conditions: req.body.medical_conditions,
     gender: req.body.gender,
     birth_date: req.body.birth_date
   };
   console.log(registerData);
-  const sql = `insert into Patients(prename, firstname, lastname, birth_date, gender, register_datetime, username, password) 
+  const sql = `insert into Patients(prename, firstname, lastname, birth_date, gender, register_datetime, username, password, iden_id, contact_number, add_contact_number, medical_conditions) 
     values("${registerData.prename}",
      "${registerData.firstname}",
      "${registerData.lastname}",
@@ -133,12 +137,16 @@ app.post('/register', bypasslogin, function (req, res) {
      "${registerData.gender}",
      "${time_conv}",
      "${registerData.username}",
-     "${registerData.password}")`;
+     "${registerData.password}",
+     "${registerData.iden_id}",
+     "${registerData.contact_num}",
+     "${registerData.add_contact}",
+     "${registerData.medical_conditions}")`;
   db.run(sql, function (err) {
     if (err) throw err;
     console.log("Add user successfully.");
   });
-  res.redirect('/register');
+  res.redirect('/login');
 });
 
 app.get('/logout', function (req, res) {
