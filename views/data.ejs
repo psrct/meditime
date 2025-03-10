@@ -125,6 +125,8 @@
         <%-include("script-toggle-sidebar")%>
         <script>
 
+          var hasaedit = false;
+  
           const tasks_data = <%-JSON.stringify(tasks_data)%>;
           const subtasks_data = <%-JSON.stringify(subtasks_data)%>;
 
@@ -210,6 +212,7 @@
               temEditButton.innerHTML = `<i class="lni lni-pencil-1" style="font-size:25px"></i>`;
               temEditButton.className = "edit-button";
               aedit.appendChild(temEditButton);
+              hasaedit = true;
             <% } %>
 
             const task_id = document.createElement("p");
@@ -269,7 +272,9 @@
             });
 
             temDiv.appendChild(temTaskDiv);
-            temDiv.appendChild(aedit);
+            if(hasaedit){
+              temDiv.appendChild(aedit);
+            }
             return temDiv;
           }
   
