@@ -99,7 +99,11 @@
                                     <%=( Math.floor( item.duration / 60) )%> ชั่วโมง
                                         <% } %>
                                             <%=( Math.floor( item.duration % 60) )%> นาที</p>
-                            <p>จองได้ด้วยตนเอง : <%=(item.only_doctor=="Yes" ) ? "❌" : "✅" %>
+                            <% if(user.usertype == "patient"){ %>
+                                <p>จองได้ด้วยตนเอง : <%=(item.only_doctor=="Yes" ) ? "❌" : "✅" %>
+                            <% }else{ %>
+                                <p>คนไข้สามารถจองเองได้ : <%=(item.only_doctor=="Yes" ) ? "❌" : "✅" %>
+                            <% } %>
                             </p>
                             <div class="flex">
                                 <% if (item.status==='Active' ) { %>
