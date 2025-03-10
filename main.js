@@ -245,7 +245,7 @@ app.post('/profile', checkLoggedIn, isPatient, function (req, res) {
     birth_date: req.body.birth_date,
     gender: req.body.gender,
     iden_id: req.body.iden_id,
-    connum: req.body.contact_num,
+    connum: req.body.contact_number,
     add_connum: req.body.add_contact,
     medcon: req.body.medical_conditions
   }
